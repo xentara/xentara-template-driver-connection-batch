@@ -12,7 +12,6 @@
 #include <xentara/memory/WriteSentinel.hpp>
 #include <xentara/model/Attribute.hpp>
 #include <xentara/process/ExecutionContext.hpp>
-#include <xentara/utils/io/FileOutputStream.hpp>
 #include <xentara/utils/json/decoder/Object.hpp>
 #include <xentara/utils/json/decoder/Errors.hpp>
 #include <xentara/utils/eh/currentErrorCode.hpp>
