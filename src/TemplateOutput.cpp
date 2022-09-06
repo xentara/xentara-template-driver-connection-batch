@@ -34,8 +34,19 @@ auto TemplateOutput::loadConfig(const ConfigIntializer &initializer,
 	bool ioBatchLoaded = false;
 	for (auto && [name, value] : jsonObject)
     {
-		/// @todo load configuration parameters
-		if (name == u8"TODO"sv)
+		/// @todo use a more descriptive keyword, e.g. "poll"
+		if (name == u8"ioBatch"sv)
+		{
+			resolver.submit<TemplateIoBatch>(value, [this](std::reference_wrapper<TemplateIoBatch> ioBatch)
+				{ 
+					_ioBatch = &ioBatch.get();
+					ioBatch.get().addInput(*this);
+					ioBatch.get().addOutput(*this);
+				});
+			ioBatchLoaded = true;
+		}
+		/// @todo load custom configuration parameters
+		else if (name == u8"TODO"sv)
 		{
 			/// @todo parse the value correctly
 			auto todo = value.asNumber<std::uint64_t>();
@@ -49,17 +60,6 @@ auto TemplateOutput::loadConfig(const ConfigIntializer &initializer,
 
 			/// @todo set the appropriate member variables, and update configAttributes accordingly (if necessary) 
 		}
-		/// @todo use a more descriptive keyword, e.g. "poll"
-		else if (name == u8"ioBatch"sv)
-		{
-			resolver.submit<TemplateIoBatch>(value, [this](std::reference_wrapper<TemplateIoBatch> ioBatch)
-				{ 
-					_ioBatch = &ioBatch.get();
-					ioBatch.get().addInput(*this);
-					ioBatch.get().addOutput(*this);
-				});
-			ioBatchLoaded = true;
-		}
 		else
 		{
 			// Pass any unknown parameters on to the fallback handler, which will load the built-in parameters ("id" and "uuid"),
@@ -68,17 +68,17 @@ auto TemplateOutput::loadConfig(const ConfigIntializer &initializer,
 		}
     }
 
-	/// @todo perform consistency and completeness checks
-	if (!"TODO")
-	{
-		/// @todo use an error message that tells the user exactly what is wrong
-		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("TODO is wrong with template output"));
-	}
 	// Make sure that an I/O batch was specified
 	if (!ioBatchLoaded)
 	{
 		/// @todo replace "I/O batch" and "template output" with more descriptive names
 		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("missing I/O batch in template output"));
+	}
+	/// @todo perform consistency and completeness checks
+	if (!"TODO")
+	{
+		/// @todo use an error message that tells the user exactly what is wrong
+		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("TODO is wrong with template output"));
 	}
 }
 
