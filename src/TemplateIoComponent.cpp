@@ -346,7 +346,7 @@ auto TemplateIoComponent::resolveTask(std::u16string_view name) -> std::shared_p
 		return std::shared_ptr<process::Task>(sharedFromThis(), &_reconnectTask);
 	}
 
-	/// @todo resolve any additional tasks
+	/// @todo add any additional tasks this class supports
 
 	return nullptr;
 }
@@ -363,7 +363,7 @@ auto TemplateIoComponent::resolveEvent(std::u16string_view name) -> std::shared_
 		return std::shared_ptr<process::Event>(sharedFromThis(), &_disconnectedEvent);
 	}
 
-	/// @todo resolve any additional events
+	/// @todo add any additional events this class supports
 
 	return nullptr;
 }
@@ -384,7 +384,7 @@ auto TemplateIoComponent::readHandle(const model::Attribute &attribute) const no
 		return _stateDataBlock.member(&State::_error);
 	}
 
-	/// @todo add support for any additional attributes
+	/// @todo add any additional readable attributes this class supports
 
 	// Nothing found
 	return data::ReadHandle::Error::Unknown;

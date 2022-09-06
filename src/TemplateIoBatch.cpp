@@ -116,8 +116,6 @@ auto TemplateIoBatch::addOutput(std::reference_wrapper<AbstractOutput> output) -
 
 auto TemplateIoBatch::resolveAttribute(std::u16string_view name) -> const model::Attribute *
 {
-	/// @todo add any attributes this class supports directly, including attributes inherited from the I/O component
-
 	// Check the read state attributes
 	if (auto attribute = _readState.resolveAttribute(name))
 	{
@@ -129,13 +127,13 @@ auto TemplateIoBatch::resolveAttribute(std::u16string_view name) -> const model:
 		return attribute;
 	}
 
+	/// @todo add any additional attributes this class supports, including attributes inherited from the I/O component
+
 	return nullptr;
 }
 
 auto TemplateIoBatch::resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event>
 {
-	/// @todo add any events this class supports directly
-
 	// Check the read state events
 	if (auto event = _readState.resolveEvent(name, sharedFromThis()))
 	{
@@ -146,6 +144,8 @@ auto TemplateIoBatch::resolveEvent(std::u16string_view name) -> std::shared_ptr<
 	{
 		return event;
 	}
+
+	/// @todo add any additional events this class supports, including events inherited from the I/O component
 
 	return nullptr;
 }
@@ -163,7 +163,7 @@ auto TemplateIoBatch::readHandle(const model::Attribute &attribute) const noexce
 		return *handle;
 	}
 
-	/// @todo add any additional attributes inherited from the I/O component and the I/O batch
+	/// @todo add any additional readable attributes this class supports, including attributes inherited from the I/O component
 
 	return data::ReadHandle::Error::Unknown;
 }

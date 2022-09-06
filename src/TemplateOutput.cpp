@@ -103,7 +103,6 @@ auto TemplateOutput::resolveAttribute(std::u16string_view name) -> const model::
 	}
 
 	// Check all the attributes we support directly
-	/// @todo add any additional attributes this class supports, including attributes inherited from the I/O component and the I/O batch
 	if (auto attribute = model::Attribute::resolve(name,
 		kValueAttribute))
 	{
@@ -127,13 +126,13 @@ auto TemplateOutput::resolveAttribute(std::u16string_view name) -> const model::
 		return attribute;
 	}
 
+	/// @todo add any additional attributes this class supports, including attributes inherited from the I/O component and the I/O batch
+
 	return nullptr;
 }
 
 auto TemplateOutput::resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event>
 {
-	/// @todo add any events this class supports directly
-
 	// Check the read state events
 	if (auto event = _readState.resolveEvent(name, sharedFromThis()))
 	{
@@ -151,6 +150,8 @@ auto TemplateOutput::resolveEvent(std::u16string_view name) -> std::shared_ptr<p
 		return event;
 	}
 
+	/// @todo add any additional events this class supports, including events inherited from the I/O component and the I/O batch
+
 	return nullptr;
 }
 
@@ -167,7 +168,7 @@ auto TemplateOutput::readHandle(const model::Attribute &attribute) const noexcep
 	const auto &readDataBlock = _ioBatch->readDataBlock();
 	const auto &writeDataBlock = _ioBatch->writeDataBlock();
 	
-	/// @todo add any additional attributes this class supports
+	// Handle the value attribute separately
 	if (attribute == kValueAttribute)
 	{
 		return _readState.valueReadHandle(readDataBlock);
@@ -190,19 +191,21 @@ auto TemplateOutput::readHandle(const model::Attribute &attribute) const noexcep
 		return *handle;
 	}
 
-	/// @todo add any additional attributes inherited from the I/O component and the I/O batch
+	/// @todo add any additional readable attributes this class supports, including attributes inherited from the I/O component and the I/O batch
 
 	return data::ReadHandle::Error::Unknown;
 }
 
 auto TemplateOutput::writeHandle(const model::Attribute &attribute) noexcept -> data::WriteHandle
 {
-	// There is only one writable attribute
+	// Handle the value attribute
 	if (attribute == kValueAttribute)
 	{
 		/// @todo use the correct value type
 		return { std::in_place_type<double>, &TemplateOutput::scheduleOutputValue, weakFromThis() };
 	}
+
+	/// @todo add any additional writable attributes this class supports, including attributes inherited from the I/O component and the I/O batch
 
 	return data::WriteHandle::Error::Unknown;
 }

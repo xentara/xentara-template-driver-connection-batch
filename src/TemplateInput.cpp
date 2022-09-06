@@ -100,7 +100,6 @@ auto TemplateInput::resolveAttribute(std::u16string_view name) -> const model::A
 	}
 
 	// Check all the attributes we support directly
-	/// @todo add any additional attributes this class supports, including attributes inherited from the I/O component and the I/O batch
 	if (auto attribute = model::Attribute::resolve(name,
 		kValueAttribute))
 	{
@@ -118,6 +117,8 @@ auto TemplateInput::resolveAttribute(std::u16string_view name) -> const model::A
 		return attribute;
 	}
 
+	/// @todo add any additional attributes this class supports, including attributes inherited from the I/O component and the I/O batch
+
 	return nullptr;
 }
 
@@ -130,8 +131,6 @@ auto TemplateInput::resolveEvent(std::u16string_view name) -> std::shared_ptr<pr
 		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateInput::resolveEvent() called before cross references have been resolved");
 	}
 
-	/// @todo add any events this class supports directly
-
 	// Check the state events
 	if (auto event = _state.resolveEvent(name, sharedFromThis()))
 	{
@@ -142,6 +141,8 @@ auto TemplateInput::resolveEvent(std::u16string_view name) -> std::shared_ptr<pr
 	{
 		return event;
 	}
+
+	/// @todo add any additional events this class supports, including events inherited from the I/O component and the I/O batch
 
 	return nullptr;
 }
@@ -158,7 +159,7 @@ auto TemplateInput::readHandle(const model::Attribute &attribute) const noexcept
 	// Get the data block
 	const auto &dataBlock = _ioBatch->readDataBlock();
 	
-	/// @todo add any additional attributes this class supports
+	// Handle the value attribute separately
 	if (attribute == kValueAttribute)
 	{
 		return _state.valueReadHandle(dataBlock);
@@ -175,7 +176,7 @@ auto TemplateInput::readHandle(const model::Attribute &attribute) const noexcept
 		return *handle;
 	}
 
-	/// @todo add any additional attributes inherited from the I/O component and the I/O batch
+	/// @todo add any additional readable attributes this class supports, including attributes inherited from the I/O component and the I/O batch
 
 	return data::ReadHandle::Error::Unknown;
 }
