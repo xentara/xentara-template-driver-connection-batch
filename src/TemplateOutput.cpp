@@ -200,6 +200,7 @@ auto TemplateOutput::writeHandle(const model::Attribute &attribute) noexcept -> 
 	// Handle the value attribute
 	if (attribute == kValueAttribute)
 	{
+		// This magic code creates a write handle of type double that calls scheduleWrite() on this.
 		/// @todo use the correct value type
 		return { std::in_place_type<double>, &TemplateOutput::scheduleOutputValue, weakFromThis() };
 	}
