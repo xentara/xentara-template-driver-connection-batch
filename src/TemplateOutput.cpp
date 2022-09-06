@@ -98,7 +98,7 @@ auto TemplateOutput::resolveAttribute(std::u16string_view name) -> const model::
 	// set already.
 	if (!_ioBatch)
 	{
-		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateInput::resolveAttribute() called before cross references have been resolved");
+		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateOutput::resolveAttribute() called before cross references have been resolved");
 	}
 
 	// Check all the attributes we support directly
