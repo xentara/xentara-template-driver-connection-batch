@@ -136,6 +136,7 @@ private:
 	/// @todo give this a more descriptive name, e.g. "_poll"
 	TemplateIoBatch *_ioBatch { nullptr };
 
+	/// @class xentara::plugins::templateDriver::TemplateInput
 	/// @todo add information needed to decode the value from the payload of a read command, like e.g. a data offset.
 
 	/// @brief The state
