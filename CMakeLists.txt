@@ -3,6 +3,15 @@ cmake_minimum_required(VERSION 3.22)
 # TODO: rename project and add description, URL etc.
 project(xentara-template-driver	LANGUAGES CXX)
 
+# Force the use of C++ 20
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+
+# Tell MSVC to set __cplusplus to the correct value
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	add_compile_options("/Zc:__cplusplus")
+endif()
+
 # Find the Xentara utility and plugin libraries
 find_package(XentaraUtils REQUIRED)
 find_package(XentaraPlugin REQUIRED)
