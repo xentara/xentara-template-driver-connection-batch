@@ -267,7 +267,7 @@ private:
 	Handle _handle;
 	/// @brief The last error we encountered.
 	/// 
-	/// May have the following values
+	/// May have the following values:
 	/// - If the connection is open, this will be a default constructed std::error_code object
 	/// - If the connection was closed gracefully, this will be CustomError::NotConnected;
 	/// - Otherwise, this will contain an appropriate error code
