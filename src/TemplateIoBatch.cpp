@@ -220,10 +220,13 @@ auto TemplateIoBatch::prepare() -> void
 
 auto TemplateIoBatch::ioComponentStateChanged(std::chrono::system_clock::time_point timeStamp, std::error_code error) -> void
 {
+	// We cannot reset the error to Ok because we don't have a read command payload. So we use the special custom error code instead.
+	auto effectiveError = error ? error : CustomError::NoData;
+
 	// Update the inputs. We do not notify the I/O component, because that is who this message comes from in the first place.
 	// Note: the write state is not updated, because the write state simply contains the last write error, which is unaffected
 	// by I/O component errors.
-	updateInputs(timeStamp, error);
+	updateInputs(timeStamp, effectiveError);
 }
 
 auto TemplateIoBatch::performReadTask(const process::ExecutionContext &context) -> void
