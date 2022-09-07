@@ -204,6 +204,10 @@ auto TemplateIoBatch::realize() -> void
 		input.get().attachOutput(_writeDataArray, writeEventCount);
 	}
 
+	// Create the data blocks
+	_readDataBlock.create(memory::memoryResources::data());
+	_writeDataBlock.create(memory::memoryResources::data());
+
 	// Reserve space in the buffers
 	_runtimeBuffers._eventsToFire.reset(std::max(readEventCount, writeEventCount));
 	_runtimeBuffers._outputsToNotify.reset(_outputs.size());
