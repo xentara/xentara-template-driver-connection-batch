@@ -64,7 +64,6 @@ auto WriteTask<Target>::preOperational(const process::ExecutionContext &context)
 template <typename Target>
 auto WriteTask<Target>::operational(const process::ExecutionContext &context) -> void
 {
-	// read the value
 	_target.get().performWriteTask(context);
 }
 
