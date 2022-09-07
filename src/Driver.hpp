@@ -17,9 +17,14 @@ namespace xentara::plugins::templateDriver
 using namespace std::literals;
 
 /// @brief The driver class
+///
+/// This class registers all the elements the driver provides, and creates the driver runtime environment.
 class Driver final : public io::Driver
 {
 public:
+	/// @name Virtual Overrides for io::Driver
+	/// @{
+
 	auto name() const -> std::u16string_view final
 	{
 		/// @todo change class name
@@ -43,6 +48,8 @@ public:
 	}
 
 	auto createEnvironment() -> std::unique_ptr<io::Driver::Environment> final;
+	
+	/// @}
 
 private:
 	/// @class xentara::plugins::templateDriver::Driver::Environment

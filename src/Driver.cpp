@@ -16,8 +16,13 @@ public:
 	/// @class xentara::plugins::templateDriver::Driver::Environment
 	/// @todo add destructor to perform global cleanup, if necessary
 
+	/// @name Virtual Overrides for io::Driver::Environment
+	/// @{
+
 	auto createComponent(const io::ComponentClass &componentClass, plugin::SharedFactory<io::Component> &factory)
 		-> std::shared_ptr<io::Component> final;
+
+	/// @}
 };
 
 auto Driver::Environment::createComponent(const io::ComponentClass &componentClass,

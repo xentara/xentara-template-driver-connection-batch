@@ -16,17 +16,20 @@
 namespace xentara::plugins::templateDriver
 {
 
-/// @brief This is the plugin class.
-///
-/// This class registers all the drivers and service providers.
+/// @brief The class that registers the library as a Xentara plugin.
 class Plugin final : plugin::Plugin
 {
 public:
+	/// @name Virtual Overrides for plugin::Plugin
+	/// @{
+
 	auto registerObjects(Registry & registry) -> void final
 	{
 		// Register the driver object.
 		registry << _driver;
 	}
+	
+	/// @}
 
 private:
 	/// @brief The driver object
