@@ -73,15 +73,18 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	)
 endif()
 
-# Try to find doxygen
+# Generate the plugin manifest and add the plugin files to the install target
+install_xentara_plugin(${PROJECT_NAME})
+
+# Try to find Doxygen
 find_package(Doxygen QUIET)
 
-# Generate Doxygen documentation, if doxygen was found
+# Generate Doxygen documentation, if Doxygen was found
 if(Doxygen_FOUND)
 	# Get the list of source files from the library
 	get_target_property(target_sources ${PROJECT_NAME} SOURCES)
 
-	# Set some useful doxygen options
+	# Set some useful Doxygen options
 	set(DOXYGEN_QUIET YES)
 	set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/docs")
 	set(DOXYGEN_EXTRACT_PRIVATE YES)
@@ -104,8 +107,6 @@ if(Doxygen_FOUND)
 		"${xentara_plugin_tag_file}=https://docs.xentara.io/xentara-plugin"
 	)
 
-	# Add a target to generate the doxygen documentation
+	# Add a target to generate the Doxygen documentation
 	doxygen_add_docs(docs ${target_sources})
 endif()
-
-install_xentara_plugin(${PROJECT_NAME})
