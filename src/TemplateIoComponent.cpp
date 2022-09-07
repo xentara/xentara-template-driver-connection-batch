@@ -159,7 +159,7 @@ auto TemplateIoComponent::updateState(std::chrono::system_clock::time_point time
 	// because the memory resource might use swap-in.
 	state._connectionTime = wasConnected != connected ? timeStamp : oldState._connectionTime;
 
-	// Update the error, using NotConnected as error for a graceful disconnect
+	// Update the error code
 	state._error = attributes::errorCode(error);
 
 	// Commit the data before sending the events
