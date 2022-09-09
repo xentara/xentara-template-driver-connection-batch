@@ -96,7 +96,7 @@ auto TemplateOutput::resolveAttribute(std::u16string_view name) -> const model::
 {
 	// resolveAttribute() must not be called before references have been resolved, so the I/O batch should have been
 	// set already.
-	if (!_ioBatch)
+	if (!_ioBatch) [[unlikely]]
 	{
 		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateOutput::resolveAttribute() called before cross references have been resolved");
 	}
@@ -158,7 +158,7 @@ auto TemplateOutput::readHandle(const model::Attribute &attribute) const noexcep
 {
 	// readHandle() must not be called before references have been resolved, so the I/O batch should have been
 	// set already.
-	if (!_ioBatch)
+	if (!_ioBatch) [[unlikely]]
 	{
 		// Don't throw an exception, because this function is noexcept
 		return std::make_error_code(std::errc::invalid_argument);
