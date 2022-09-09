@@ -199,9 +199,9 @@ auto TemplateIoBatch::realize() -> void
 		input.get().attachInput(_readDataArray, readEventCount);
 	}
 	// Attach all the outputs
-	for (auto &&input : _outputs)
+	for (auto &&output : _outputs)
 	{
-		input.get().attachOutput(_writeDataArray, writeEventCount);
+		output.get().attachOutput(_writeDataArray, writeEventCount);
 	}
 
 	// Create the data blocks
