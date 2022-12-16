@@ -138,6 +138,8 @@ public:
 	/// @{
 
 	auto resolveAttribute(std::u16string_view name) -> const model::Attribute * final;
+	
+	auto resolveTask(std::u16string_view name) -> std::shared_ptr<process::Task> final;
 
 	auto resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event> final;
 

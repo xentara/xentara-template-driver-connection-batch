@@ -131,6 +131,22 @@ auto TemplateIoBatch::resolveAttribute(std::u16string_view name) -> const model:
 	return nullptr;
 }
 
+auto TemplateIoBatch::resolveTask(std::u16string_view name) -> std::shared_ptr<process::Task>
+{
+	if (name == u"read"sv)
+	{
+		return std::shared_ptr<process::Task>(sharedFromThis(), &_readTask);
+	}
+	if (name == u"write"sv)
+	{
+		return std::shared_ptr<process::Task>(sharedFromThis(), &_writeTask);
+	}
+
+	/// @todo add any additional tasks this class supports
+
+	return nullptr;
+}
+
 auto TemplateIoBatch::resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event>
 {
 	// Check the read state events
