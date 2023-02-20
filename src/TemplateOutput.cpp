@@ -35,7 +35,7 @@ auto TemplateOutput::loadConfig(const ConfigIntializer &initializer,
 	for (auto && [name, value] : jsonObject)
     {
 		/// @todo use a more descriptive keyword, e.g. "poll"
-		if (name == u8"ioBatch"sv)
+		if (name == "ioBatch"sv)
 		{
 			resolver.submit<TemplateIoBatch>(value, [this](std::reference_wrapper<TemplateIoBatch> ioBatch)
 				{ 
@@ -46,7 +46,7 @@ auto TemplateOutput::loadConfig(const ConfigIntializer &initializer,
 			ioBatchLoaded = true;
 		}
 		/// @todo load custom configuration parameters
-		else if (name == u8"TODO"sv)
+		else if (name == "TODO"sv)
 		{
 			/// @todo parse the value correctly
 			auto todo = value.asNumber<std::uint64_t>();
@@ -92,7 +92,7 @@ auto TemplateOutput::directions() const -> io::Directions
 	return io::Direction::Input | io::Direction::Output;
 }
 
-auto TemplateOutput::resolveAttribute(std::u16string_view name) -> const model::Attribute *
+auto TemplateOutput::resolveAttribute(std::string_view name) -> const model::Attribute *
 {
 	// resolveAttribute() must not be called before references have been resolved, so the I/O batch should have been
 	// set already.
@@ -130,7 +130,7 @@ auto TemplateOutput::resolveAttribute(std::u16string_view name) -> const model::
 	return nullptr;
 }
 
-auto TemplateOutput::resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event>
+auto TemplateOutput::resolveEvent(std::string_view name) -> std::shared_ptr<process::Event>
 {
 	// Check the read state events
 	if (auto event = _readState.resolveEvent(name, sharedFromThis()))

@@ -12,7 +12,7 @@ namespace xentara::plugins::templateDriver
 
 using namespace std::literals;
 
-auto CommonReadState::resolveAttribute(std::u16string_view name) -> const model::Attribute *
+auto CommonReadState::resolveAttribute(std::string_view name) -> const model::Attribute *
 {
 	// Check all the attributes we support
 	return model::Attribute::resolve(name,
@@ -21,10 +21,10 @@ auto CommonReadState::resolveAttribute(std::u16string_view name) -> const model:
 		attributes::kError);
 }
 
-auto CommonReadState::resolveEvent(std::u16string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>
+auto CommonReadState::resolveEvent(std::string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>
 {
 	// Check all the events we support
-	if (name == u"read"sv)
+	if (name == "read"sv)
 	{
 		return std::shared_ptr<process::Event>(parent, &_readEvent);
 	}

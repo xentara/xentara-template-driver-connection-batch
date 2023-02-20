@@ -9,6 +9,7 @@
 #include <xentara/config/Resolver.hpp>
 #include <xentara/data/ReadHandle.hpp>
 #include <xentara/data/WriteHandle.hpp>
+#include <xentara/memory/memoryResources.hpp>
 #include <xentara/memory/WriteSentinel.hpp>
 #include <xentara/model/Attribute.hpp>
 #include <xentara/process/ExecutionContext.hpp>
@@ -57,7 +58,7 @@ auto TemplateIoBatch::loadConfig(const ConfigIntializer &initializer,
 	for (auto && [name, value] : jsonObject)
     {
 		/// @todo load configuration parameters
-		if (name == u8"TODO"sv)
+		if (name == "TODO"sv)
 		{
 			/// @todo parse the value correctly
 			auto todo = value.asNumber<std::uint64_t>();
@@ -113,7 +114,7 @@ auto TemplateIoBatch::addOutput(std::reference_wrapper<AbstractOutput> output) -
 	_outputs.push_back(output);
 }
 
-auto TemplateIoBatch::resolveAttribute(std::u16string_view name) -> const model::Attribute *
+auto TemplateIoBatch::resolveAttribute(std::string_view name) -> const model::Attribute *
 {
 	// Check the read state attributes
 	if (auto attribute = _readState.resolveAttribute(name))
@@ -131,13 +132,13 @@ auto TemplateIoBatch::resolveAttribute(std::u16string_view name) -> const model:
 	return nullptr;
 }
 
-auto TemplateIoBatch::resolveTask(std::u16string_view name) -> std::shared_ptr<process::Task>
+auto TemplateIoBatch::resolveTask(std::string_view name) -> std::shared_ptr<process::Task>
 {
-	if (name == u"read"sv)
+	if (name == "read"sv)
 	{
 		return std::shared_ptr<process::Task>(sharedFromThis(), &_readTask);
 	}
-	if (name == u"write"sv)
+	if (name == "write"sv)
 	{
 		return std::shared_ptr<process::Task>(sharedFromThis(), &_writeTask);
 	}
@@ -147,7 +148,7 @@ auto TemplateIoBatch::resolveTask(std::u16string_view name) -> std::shared_ptr<p
 	return nullptr;
 }
 
-auto TemplateIoBatch::resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event>
+auto TemplateIoBatch::resolveEvent(std::string_view name) -> std::shared_ptr<process::Event>
 {
 	// Check the read state events
 	if (auto event = _readState.resolveEvent(name, sharedFromThis()))
@@ -183,12 +184,12 @@ auto TemplateIoBatch::readHandle(const model::Attribute &attribute) const noexce
 	return data::ReadHandle::Error::Unknown;
 }
 
-auto TemplateIoBatch::resolveReadStateAttribute(std::u16string_view name) -> const model::Attribute *
+auto TemplateIoBatch::resolveReadStateAttribute(std::string_view name) -> const model::Attribute *
 {
 	return _readState.resolveAttribute(name);
 }
 
-auto TemplateIoBatch::resolveReadStateEvent(std::u16string_view name) -> std::shared_ptr<process::Event>
+auto TemplateIoBatch::resolveReadStateEvent(std::string_view name) -> std::shared_ptr<process::Event>
 {
 	return _readState.resolveEvent(name, sharedFromThis());
 }

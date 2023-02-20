@@ -9,7 +9,7 @@ namespace xentara::plugins::templateDriver
 {
 
 template <std::regular DataType>
-auto PerValueReadState<DataType>::resolveAttribute(std::u16string_view name) -> const model::Attribute *
+auto PerValueReadState<DataType>::resolveAttribute(std::string_view name) -> const model::Attribute *
 {
 	// Check all the attributes we support
 	return model::Attribute::resolve(name,
@@ -17,7 +17,7 @@ auto PerValueReadState<DataType>::resolveAttribute(std::u16string_view name) -> 
 }
 
 template <std::regular DataType>
-auto PerValueReadState<DataType>::resolveEvent(std::u16string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>
+auto PerValueReadState<DataType>::resolveEvent(std::string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>
 {
 	// Check all the events we support
 	if (name == model::Attribute::kValue)

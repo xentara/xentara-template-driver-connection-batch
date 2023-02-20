@@ -16,10 +16,10 @@ const model::Attribute kError { model::Attribute::kError, model::Attribute::Acce
 const model::Attribute kWriteError { model::Attribute::kWriteError, model::Attribute::Access::ReadOnly, data::DataType::kInteger };
 
 /// @todo assign a unique UUID
-const model::Attribute kConnectionTime { "ffffffff-ffff-ffff-ffff-ffffffffffff"_uuid, u"connectionTime"sv, model::Attribute::Access::ReadOnly, data::DataType::kTimeStamp };
+const model::Attribute kConnectionTime { "ffffffff-ffff-ffff-ffff-ffffffffffff"_uuid, "connectionTime"sv, model::Attribute::Access::ReadOnly, data::DataType::kTimeStamp };
 
 /// @todo assign a unique UUID
-const model::Attribute kDeviceError { "abababab-abab-abab-abab-abababababab"_uuid, u"error"sv, model::Attribute::Access::ReadOnly, data::DataType::kInteger };
+const model::Attribute kDeviceError { "abababab-abab-abab-abab-abababababab"_uuid, "error"sv, model::Attribute::Access::ReadOnly, data::DataType::kInteger };
 
 /// @todo add more offsets for other categories of errors
 namespace

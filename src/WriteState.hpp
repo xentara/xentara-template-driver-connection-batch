@@ -24,7 +24,7 @@ public:
 	/// @brief Resolves an attribute that belong to this state.
 	/// @param name The name of the attribute to resolve
 	/// @return The attribute, or nullptr if we don't have an attribute with this name
-	auto resolveAttribute(std::u16string_view name) -> const model::Attribute *;
+	auto resolveAttribute(std::string_view name) -> const model::Attribute *;
 
 	/// @brief Resolves an event.
 	/// @param name The name of the event to resolve
@@ -36,7 +36,7 @@ public:
 	/// return value, so that the returned pointer will share ownership information with pointers to the parent object.
 	/// @endparblock
 	/// @return The event, or nullptr if we don't have an event with this name
-	auto resolveEvent(std::u16string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>;
+	auto resolveEvent(std::string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>;
 
 	/// @brief Creates a read-handle for an attribute that belong to this state.
 	/// @param dataBlock The data block the data is stored in

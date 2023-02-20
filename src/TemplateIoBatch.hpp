@@ -62,10 +62,10 @@ public:
 		/// @name Virtual Overrides for io::BatchClass
 		/// @{
 
-		auto name() const -> std::u16string_view final
+		auto name() const -> std::string_view final
 		{
 			/// @todo change class name
-			return u"TemplateIoBatch"sv;
+			return "TemplateIoBatch"sv;
 		}
 	
 		auto uuid() const -> utils::core::Uuid final
@@ -97,12 +97,12 @@ public:
 	/// @brief Resolves an attribute that belong to the common read state.
 	/// @param name The name of the attribute to resolve
 	/// @return The attribute, or nullptr if the read state doesn't have an attribute with this name
-	auto resolveReadStateAttribute(std::u16string_view name) -> const model::Attribute *;
+	auto resolveReadStateAttribute(std::string_view name) -> const model::Attribute *;
 
 	/// @brief Resolves an event that belong to the common read state.
 	/// @param name The name of the event to resolve
 	/// @return The event, or nullptr if the read state doesn't have an event with this name
-	auto resolveReadStateEvent(std::u16string_view name) -> std::shared_ptr<process::Event>;
+	auto resolveReadStateEvent(std::string_view name) -> std::shared_ptr<process::Event>;
 
 	/// @brief Creates a read-handle for an attribute that belong to the common read state.
 	/// @param attribute The attribute to create the handle for
@@ -137,11 +137,11 @@ public:
 	/// @name Virtual Overrides for io::IoBatch
 	/// @{
 
-	auto resolveAttribute(std::u16string_view name) -> const model::Attribute * final;
+	auto resolveAttribute(std::string_view name) -> const model::Attribute * final;
 	
-	auto resolveTask(std::u16string_view name) -> std::shared_ptr<process::Task> final;
+	auto resolveTask(std::string_view name) -> std::shared_ptr<process::Task> final;
 
-	auto resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event> final;
+	auto resolveEvent(std::string_view name) -> std::shared_ptr<process::Event> final;
 
 	auto readHandle(const model::Attribute &attribute) const noexcept -> data::ReadHandle final;
 

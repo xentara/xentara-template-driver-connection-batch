@@ -53,10 +53,10 @@ public:
 		/// @name Virtual Overrides for io::ComponentClass
 		/// @{
 
-		auto name() const -> std::u16string_view final
+		auto name() const -> std::string_view final
 		{
 			/// @todo change class name
-			return u"TemplateIoComponent"sv;
+			return "TemplateIoComponent"sv;
 		}
 	
 		auto uuid() const -> utils::core::Uuid final
@@ -161,11 +161,11 @@ public:
 
 	auto createIoBatch(const io::IoBatchClass &ioClass, plugin::SharedFactory<io::IoBatch> &factory) -> std::shared_ptr<io::IoBatch> final;
 
-	auto resolveAttribute(std::u16string_view name) -> const model::Attribute * final;
+	auto resolveAttribute(std::string_view name) -> const model::Attribute * final;
 	
-	auto resolveTask(std::u16string_view name) -> std::shared_ptr<process::Task> final;
+	auto resolveTask(std::string_view name) -> std::shared_ptr<process::Task> final;
 
-	auto resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event> final;
+	auto resolveEvent(std::string_view name) -> std::shared_ptr<process::Event> final;
 
 	auto readHandle(const model::Attribute &attribute) const noexcept -> data::ReadHandle final;
 
@@ -274,7 +274,7 @@ private:
 	std::error_code _lastError { CustomError::NotConnected };
 
 	/// @brief The data block that contains the state
-	memory::ObjectBlock<memory::memoryResources::Data, State> _stateDataBlock;
+	memory::ObjectBlock<State> _stateDataBlock;
 };
 
 inline TemplateIoComponent::ErrorSink::~ErrorSink() = default;

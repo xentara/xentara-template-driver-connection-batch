@@ -7,6 +7,7 @@
 #include "TemplateOutput.hpp"
 
 #include <xentara/data/ReadHandle.hpp>
+#include <xentara/memory/memoryResources.hpp>
 #include <xentara/memory/WriteSentinel.hpp>
 #include <xentara/model/Attribute.hpp>
 #include <xentara/plugin/SharedFactory.hpp>
@@ -42,7 +43,7 @@ auto TemplateIoComponent::loadConfig(const ConfigIntializer &initializer,
 	for (auto && [name, value] : jsonObject)
     {
 		/// @todo load configuration parameters
-		if (name == u8"TODO"sv)
+		if (name == "TODO"sv)
 		{
 			/// @todo parse the value correctly
 			auto todo = value.asNumber<std::uint64_t>();
@@ -330,7 +331,7 @@ auto TemplateIoComponent::createIoBatch(const io::IoBatchClass &ioClass, plugin:
 	return nullptr;
 }
 
-auto TemplateIoComponent::resolveAttribute(std::u16string_view name) -> const model::Attribute *
+auto TemplateIoComponent::resolveAttribute(std::string_view name) -> const model::Attribute *
 {
 	/// @todo add any additional attributes this class supports
 	return model::Attribute::resolve(name,
@@ -339,7 +340,7 @@ auto TemplateIoComponent::resolveAttribute(std::u16string_view name) -> const mo
 		attributes::kDeviceError);
 }
 
-auto TemplateIoComponent::resolveTask(std::u16string_view name) -> std::shared_ptr<process::Task>
+auto TemplateIoComponent::resolveTask(std::string_view name) -> std::shared_ptr<process::Task>
 {
 	if (name == process::Task::kReconnect)
 	{
@@ -351,7 +352,7 @@ auto TemplateIoComponent::resolveTask(std::u16string_view name) -> std::shared_p
 	return nullptr;
 }
 
-auto TemplateIoComponent::resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event>
+auto TemplateIoComponent::resolveEvent(std::string_view name) -> std::shared_ptr<process::Event>
 {
 	// Check all the events we support
 	if (name == process::Event::kConnected)

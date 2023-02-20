@@ -59,10 +59,10 @@ public:
 		/// @name Virtual Overrides for io::IoClass
 		/// @{
 
-		auto name() const -> std::u16string_view final
+		auto name() const -> std::string_view final
 		{
 			/// @todo change class name
-			return u"TemplateOutput"sv;
+			return "TemplateOutput"sv;
 		}
 	
 		auto uuid() const -> utils::core::Uuid final
@@ -94,9 +94,9 @@ public:
 
 	auto directions() const -> io::Directions final;
 
-	auto resolveAttribute(std::u16string_view name) -> const model::Attribute * final;
+	auto resolveAttribute(std::string_view name) -> const model::Attribute * final;
 
-	auto resolveEvent(std::u16string_view name) -> std::shared_ptr<process::Event> final;
+	auto resolveEvent(std::string_view name) -> std::shared_ptr<process::Event> final;
 
 	auto readHandle(const model::Attribute &attribute) const noexcept -> data::ReadHandle final;
 

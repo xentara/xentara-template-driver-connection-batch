@@ -1,7 +1,7 @@
 // Copyright (c) embedded ocean GmbH
 #pragma once
 
-#include <xentara/utils/threads/AtomicOptional.hpp>
+#include <xentara/utils/atomic/Optional.hpp>
 
 namespace xentara::plugins::templateDriver
 {
@@ -31,7 +31,7 @@ public:
 
 private:
 	/// @brief The queued value, or std::nullopt if the queue is empty.
-	utils::threads::AtomicOptional<DataType> _value;
+	utils::atomic::Optional<DataType> _value;
 
 	// Check that the value is lock free, or blocking will occurr
 	static_assert(decltype(_value)::is_always_lock_free);

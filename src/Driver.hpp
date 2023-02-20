@@ -25,10 +25,10 @@ public:
 	/// @name Virtual Overrides for io::Driver
 	/// @{
 
-	auto name() const -> std::u16string_view final
+	auto name() const -> std::string_view final
 	{
 		/// @todo change class name
-		return u"TemplateDriver"sv;
+		return "TemplateDriver"sv;
 	}
 
 	auto uuid() const -> utils::core::Uuid final
