@@ -247,7 +247,7 @@ auto TemplateIoBatch::ioComponentStateChanged(std::chrono::system_clock::time_po
 	// Update the inputs. We do not notify the I/O component, because that is who this message comes from in the first place.
 	// Note: the write state is not updated, because the write state simply contains the last write error, which is unaffected
 	// by I/O component errors.
-	updateInputs(timeStamp, effectiveError);
+	updateInputs(timeStamp, utils::eh::unexpected(effectiveError));
 }
 
 auto TemplateIoBatch::performReadTask(const process::ExecutionContext &context) -> void
@@ -288,7 +288,7 @@ auto TemplateIoBatch::handleReadError(std::chrono::system_clock::time_point time
 	-> void
 {
 	// Update our own state together with those of the inputs
-	updateInputs(timeStamp, error);
+	updateInputs(timeStamp, utils::eh::unexpected(error));
 	// Notify the I/O component
 	_ioComponent.get().handleError(timeStamp, error, this);
 }
@@ -357,7 +357,7 @@ auto TemplateIoBatch::handleWriteError(std::chrono::system_clock::time_point tim
 	_ioComponent.get().handleError(timeStamp, error, this);
 }
 
-auto TemplateIoBatch::updateInputs(std::chrono::system_clock::time_point timeStamp, const utils::eh::Failable<std::reference_wrapper<const ReadCommand::Payload>> &payloadOrError)
+auto TemplateIoBatch::updateInputs(std::chrono::system_clock::time_point timeStamp, const utils::eh::expected<std::reference_wrapper<const ReadCommand::Payload>, std::error_code> &payloadOrError)
 	-> void
 {
 	// Protect use of the pending event buffer

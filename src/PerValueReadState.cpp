@@ -66,7 +66,7 @@ template <std::regular DataType>
 auto PerValueReadState<DataType>::update(
 	WriteSentinel &writeSentinel,
 	std::chrono::system_clock::time_point timeStamp,
-	const utils::eh::Failable<DataType> &valueOrError,
+	const utils::eh::expected<DataType, std::error_code> &valueOrError,
 	const CommonReadState::Changes &commonChanges,
 	PendingEventList &eventsToFire) -> void
 {
@@ -75,7 +75,7 @@ auto PerValueReadState<DataType>::update(
 	const auto &oldState = writeSentinel.oldValues()[_stateHandle];
 
 	// Set the value, replacing errors with a default constructed value
-	state._value = valueOrError.valueOr(DataType());
+	state._value = valueOrError.value_or(DataType());
 
 	// Detect changes
 	const auto valueChanged = state._value != oldState._value;

@@ -9,7 +9,7 @@
 #include <xentara/memory/Array.hpp>
 #include <xentara/memory/WriteSentinel.hpp>
 #include <xentara/process/Event.hpp>
-#include <xentara/utils/eh/Failable.hpp>
+#include <xentara/utils/eh/expected.hpp>
 
 #include <chrono>
 #include <concepts>
@@ -77,7 +77,7 @@ public:
 	/// which is done by the caller.
 	auto update(WriteSentinel &writeSentinel,
 		std::chrono::system_clock::time_point timeStamp,
-		const utils::eh::Failable<DataType> &valueOrError,
+		const utils::eh::expected<DataType, std::error_code> &valueOrError,
 		const CommonReadState::Changes &commonChanges,
 		PendingEventList &eventsToFire) -> void;
 

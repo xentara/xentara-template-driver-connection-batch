@@ -7,7 +7,7 @@
 
 #include <xentara/memory/Array.hpp>
 #include <xentara/memory/WriteSentinel.hpp>
-#include <xentara/utils/eh/Failable.hpp>
+#include <xentara/utils/eh/expected.hpp>
 
 #include <chrono>
 #include <system_error>
@@ -54,7 +54,7 @@ public:
 	/// which is done by the caller.
 	virtual auto updateReadState(WriteSentinel &writeSentinel,
 		std::chrono::system_clock::time_point timeStamp,
-		const utils::eh::Failable<std::reference_wrapper<const ReadCommand::Payload>> &payloadOrError,
+		const utils::eh::expected<std::reference_wrapper<const ReadCommand::Payload>, std::error_code> &payloadOrError,
 		const CommonReadState::Changes &commonChanges,
 		PendingEventList &eventsToFire) -> void = 0;
 };

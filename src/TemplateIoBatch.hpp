@@ -17,7 +17,7 @@
 #include <xentara/plugin/EnableSharedFromThis.hpp>
 #include <xentara/process/Event.hpp>
 #include <xentara/utils/core/Uuid.hpp>
-#include <xentara/utils/eh/Failable.hpp>
+#include <xentara/utils/eh/expected.hpp>
 
 #include <string_view>
 #include <functional>
@@ -209,7 +209,7 @@ private:
 	/// @param payloadOrError This is a variant-like type that will hold either the payload of the read command, or an std::error_code object
 	/// containing a read error.
 	auto updateInputs(std::chrono::system_clock::time_point timeStamp,
-		const utils::eh::Failable<std::reference_wrapper<const ReadCommand::Payload>> &payloadOrError) -> void;
+		const utils::eh::expected<std::reference_wrapper<const ReadCommand::Payload>, std::error_code> &payloadOrError) -> void;
 
 	/// @brief Updates the outputs and sends events
 	/// @param timeStamp The update time stamp
