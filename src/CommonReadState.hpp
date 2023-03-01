@@ -91,8 +91,8 @@ private:
 		std::chrono::system_clock::time_point _updateTime { std::chrono::system_clock::time_point::min() };
 		/// @brief The quality of the value
 		data::Quality _quality { data::Quality::Bad };
-		/// @brief The error code when reading the value, or 0 for none.
-		attributes::ErrorCode _error { attributes::errorCode(CustomError::NotConnected) };
+		/// @brief The error code when reading the value, or a default constructed std::error_code object for none.
+		std::error_code _error { CustomError::NotConnected };
 	};
 
 	/// @brief A Xentara event that is fired when the inputs were read (sucessfully or not)

@@ -83,14 +83,14 @@ auto CommonReadState::update(
 	{
 		// Reset the error
 		state._quality = data::Quality::Good;
-		state._error = 0;
+		state._error = {};
 	}
 	// We have an error
 	else
 	{
 		// Set the error
 		state._quality = data::Quality::Bad;
-		state._error = attributes::errorCode(error);
+		state._error = error;
 	}
 
 	// Detect changes

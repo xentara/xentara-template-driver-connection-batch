@@ -71,9 +71,9 @@ private:
 	{
 		/// @brief The last time the value was written (successfully or not)
 		std::chrono::system_clock::time_point _writeTime { std::chrono::system_clock::time_point::min() };
-		/// @brief The error code when writing the value, or 0 for none.
-		/// @note The error is initialized to 0, because it is not an error if the value was never written.
-		attributes::ErrorCode _writeError { 0 };
+		/// @brief The error code when writing the value, or a default constructed std::error_code object for none.
+		/// @note The error is default initialized, because it is not an error if the value was never written.
+		std::error_code _writeError;
 	};
 
 	/// @brief A Xentara event that is fired when the value was successfully written

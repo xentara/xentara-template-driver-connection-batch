@@ -161,7 +161,7 @@ auto TemplateIoComponent::updateState(std::chrono::system_clock::time_point time
 	state._connectionTime = wasConnected != connected ? timeStamp : oldState._connectionTime;
 
 	// Update the error code
-	state._error = attributes::errorCode(error);
+	state._error = error;
 
 	// Commit the data before sending the events
 	sentinel.commit();

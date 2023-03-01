@@ -71,7 +71,7 @@ auto WriteState::update(WriteSentinel &writeSentinel,
 
 	// Update the state
 	state._writeTime = timeStamp;
-	state._writeError = attributes::errorCode(error);
+	state._writeError = error;
 
 	// Cause the correct events to be fired
 	if (!error)
