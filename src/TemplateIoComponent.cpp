@@ -2,16 +2,20 @@
 #include "TemplateIoComponent.hpp"
 
 #include "Attributes.hpp"
-#include "TemplateIoBatch.hpp"
+#include "TemplateBatchTransaction.hpp"
 #include "TemplateInput.hpp"
 #include "TemplateOutput.hpp"
 
+#include <xentara/config/FallbackHandler.hpp>
 #include <xentara/data/ReadHandle.hpp>
 #include <xentara/memory/memoryResources.hpp>
 #include <xentara/memory/WriteSentinel.hpp>
 #include <xentara/model/Attribute.hpp>
-#include <xentara/plugin/SharedFactory.hpp>
+#include <xentara/model/ForEachAttributeFunction.hpp>
+#include <xentara/model/ForEachEventFunction.hpp>
+#include <xentara/model/ForEachTaskFunction.hpp>
 #include <xentara/process/ExecutionContext.hpp>
+#include <xentara/skill/ElementFactory.hpp>
 #include <xentara/utils/eh/currentErrorCode.hpp>
 #include <xentara/utils/json/decoder/Object.hpp>
 #include <xentara/utils/json/decoder/Errors.hpp>
@@ -34,7 +38,7 @@ TemplateIoComponent::Class TemplateIoComponent::Class::_instance;
 auto TemplateIoComponent::loadConfig(const ConfigIntializer &initializer,
 		utils::json::decoder::Object &jsonObject,
 		config::Resolver &resolver,
-		const FallbackConfigHandler &fallbackHandler) -> void
+		const config::FallbackHandler &fallbackHandler) -> void
 {
 	// Get a reference that allows us to modify our own config attributes
     auto &&configAttributes = initializer[Class::instance().configHandle()];
@@ -301,75 +305,56 @@ auto TemplateIoComponent::handleError(std::chrono::system_clock::time_point time
 	updateState(timeStamp, error, sender);
 }
 
-auto TemplateIoComponent::createIo(const io::IoClass &ioClass, plugin::SharedFactory<io::Io> &factory)
-	-> std::shared_ptr<io::Io>
+auto TemplateIoComponent::createChildElement(const skill::Element::Class &elementClass, skill::ElementFactory &factory)
+	-> std::shared_ptr<skill::Element>
 {
-	if (&ioClass == &TemplateInput::Class::instance())
+	if (&elementClass == &TemplateInput::Class::instance())
 	{
 		return factory.makeShared<TemplateInput>(*this);
 	}
-	else if (&ioClass == &TemplateOutput::Class::instance())
+	else if (&elementClass == &TemplateOutput::Class::instance())
 	{
 		return factory.makeShared<TemplateOutput>(*this);
 	}
+	else if (&elementClass == &TemplateBatchTransaction::Class::instance())
+	{
+		return factory.makeShared<TemplateBatchTransaction>(*this);
+	}
 
-	/// @todo add any other supported I/O point types
+	/// @todo add any other supported child element types
 
 	return nullptr;
 }
 
-auto TemplateIoComponent::createIoBatch(const io::IoBatchClass &ioClass, plugin::SharedFactory<io::IoBatch> &factory)
-	-> std::shared_ptr<io::IoBatch>
+auto TemplateIoComponent::forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool
 {
-	if (&ioClass == &TemplateIoBatch::Class::instance())
-	{
-		return factory.makeShared<TemplateIoBatch>(*this);
-	}
-
-	/// @todo add any other supported I/O batch types
-
-	return nullptr;
+	/// @todo handle any additional attributes this class supports
+	return
+		function(model::Attribute::kDeviceState) ||
+		function(attributes::kConnectionTime) ||
+		function(attributes::kDeviceError);
 }
 
-auto TemplateIoComponent::resolveAttribute(std::string_view name) -> const model::Attribute *
+auto TemplateIoComponent::forEachEvent(const model::ForEachEventFunction &function) -> bool
 {
-	/// @todo add any additional attributes this class supports
-	return model::Attribute::resolve(name,
-		model::Attribute::kDeviceState,
-		attributes::kConnectionTime,
-		attributes::kDeviceError);
+	// Handle all the events we support
+	return
+		function(process::Event::kConnected, sharedFromThis(&_connectedEvent)) ||
+		function(process::Event::kDisconnected, sharedFromThis(&_disconnectedEvent));
+
+	/// @todo handle any additional events this class supports
 }
 
-auto TemplateIoComponent::resolveTask(std::string_view name) -> std::shared_ptr<process::Task>
+auto TemplateIoComponent::forEachTask(const model::ForEachTaskFunction &function) -> bool
 {
-	if (name == process::Task::kReconnect)
-	{
-		return std::shared_ptr<process::Task>(sharedFromThis(), &_reconnectTask);
-	}
+	// Handle all the tasks we support
+	return
+		function(process::Task::kReconnect, sharedFromThis(&_reconnectTask));
 
-	/// @todo add any additional tasks this class supports
-
-	return nullptr;
+	/// @todo handle any additional tasks this class supports
 }
 
-auto TemplateIoComponent::resolveEvent(std::string_view name) -> std::shared_ptr<process::Event>
-{
-	// Check all the events we support
-	if (name == process::Event::kConnected)
-	{
-		return std::shared_ptr<process::Event>(sharedFromThis(), &_connectedEvent);
-	}
-	else if (name == process::Event::kDisconnected)
-	{
-		return std::shared_ptr<process::Event>(sharedFromThis(), &_disconnectedEvent);
-	}
-
-	/// @todo add any additional events this class supports
-
-	return nullptr;
-}
-
-auto TemplateIoComponent::readHandle(const model::Attribute &attribute) const noexcept -> data::ReadHandle
+auto TemplateIoComponent::makeReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
 {
 	// Try our attributes
 	if (attribute == model::Attribute::kDeviceState)
@@ -385,10 +370,10 @@ auto TemplateIoComponent::readHandle(const model::Attribute &attribute) const no
 		return _stateDataBlock.member(&State::_error);
 	}
 
-	/// @todo add any additional readable attributes this class supports
+	/// @todo handle any additional readable attributes this class supports
 
 	// Nothing found
-	return data::ReadHandle::Error::Unknown;
+	return std::nullopt;
 }
 
 auto TemplateIoComponent::realize() -> void

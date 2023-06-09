@@ -18,7 +18,7 @@ namespace xentara::plugins::templateDriver
 
 class TemplateIoComponent;
 
-/// @brief Base class for inputs and outputs that can be read by an I/O batch
+/// @brief Base class for inputs and outputs that can be read by a batch transaction
 ///
 /// This class is used for inputs, but also for outputs. This is the case because outputs need to be able to read back
 /// the currently set value from the I/O component.
@@ -27,7 +27,7 @@ class AbstractInput
 public:
 	/// @brief Virtual destructor
 	/// @note The destructor is pure virtual (= 0) to ensure that this class will remain abstract, even if we should remove all
-	/// other pure virtual functions later. This is not necessary, of course, but prefents the abstract class from becoming
+	/// other pure virtual functions later. This is not necessary, of course, but prevents the abstract class from becoming
 	/// instantiable by accident as a result of refactoring.
 	virtual ~AbstractInput() = 0;
 
@@ -35,7 +35,7 @@ public:
 	/// @todo give this a more descriptive name, e.g. "_device"
 	virtual auto ioComponent() const -> const TemplateIoComponent & = 0;
 	
-	/// @brief Attaches the input to its I/O batch
+	/// @brief Attaches the input to its batch transaction
 	/// @param dataArray The data array that the attributes should be added to. The caller will use the information in this array
 	/// to allocate the data block.
 	/// @param eventCount A variable that counts the total number of events than can be fired for a single update.

@@ -4,14 +4,14 @@
 #include "Attributes.hpp"
 #include "CustomError.hpp"
 
-#include <xentara/io/Component.hpp>
-#include <xentara/io/ComponentClass.hpp>
-#include <xentara/plugin/EnableSharedFromThis.hpp>
 #include <xentara/memory/Array.hpp>
+#include <xentara/memory/ObjectBlock.hpp>
 #include <xentara/process/Event.hpp>
 #include <xentara/process/Task.hpp>
-#include <xentara/utils/tools/Unique.hpp>
+#include <xentara/skill/Element.hpp>
+#include <xentara/skill/EnableSharedFromThis.hpp>
 #include <xentara/utils/core/Uuid.hpp>
+#include <xentara/utils/tools/Unique.hpp>
 
 #include <string_view>
 #include <functional>
@@ -24,7 +24,7 @@ using namespace std::literals;
 
 /// @brief A class representing a specific type of I/O component.
 /// @todo rename this class to something more descriptive
-class TemplateIoComponent final : public io::Component, public plugin::EnableSharedFromThis<TemplateIoComponent>
+class TemplateIoComponent final : public skill::Element, public skill::EnableSharedFromThis<TemplateIoComponent>
 {
 private:
 	/// @brief A structure used to store the class specific attributes within an element's configuration
@@ -35,7 +35,7 @@ private:
 	
 public:
 	/// @brief The class object containing meta-information about this element type
-	class Class final : public io::ComponentClass
+	class Class final : public skill::Element::Class
 	{
 	public:
 		/// @brief Gets the global object
@@ -50,7 +50,7 @@ public:
             return _configHandle;
         }
 
-		/// @name Virtual Overrides for io::ComponentClass
+		/// @name Virtual Overrides for skill::Element::Class
 		/// @{
 
 		auto name() const -> std::string_view final
@@ -62,7 +62,7 @@ public:
 		auto uuid() const -> utils::core::Uuid final
 		{
 			/// @todo assign a unique UUID
-			return "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"_uuid;
+			return "deadbeef-dead-beef-dead-beefdeadbeef"_uuid;
 		}
 
 		/// @}
@@ -94,7 +94,7 @@ public:
 	public:
 		/// @brief Virtual destructor
 		/// @note The destructor is pure virtual (= 0) to ensure that this class will remain abstract, even if we should remove all
-		/// other pure virtual functions later. This is not necessary, of course, but prefents the abstract class from becoming
+		/// other pure virtual functions later. This is not necessary, of course, but prevents the abstract class from becoming
 		/// instantiable by accident as a result of refactoring.
 		virtual ~ErrorSink() = 0;
 
@@ -136,7 +136,7 @@ public:
 	/// so any error sinks calling this must be prepared to have ioComponentStateChanged() called from within this function.
 	auto requestDisconnect(std::chrono::system_clock::time_point timeStamp) noexcept -> void;
 	
-	/// @brief Notifies the I/O component that an error was detected from outside, e.g. when reading or writing an I/O point.
+	/// @brief Notifies the I/O component that an error was detected from outside, e.g. when reading or writing a data point.
 	/// 
 	/// If this error affects the I/O component as a whole, error sinks will be notified. If the sender is an error sink itself,
 	/// and does not whish to be notified, but intends to handle the error itself instead, it can pass a pointer to itself as the sender parameter. 
@@ -154,33 +154,32 @@ public:
 		return _handle;
 	}
 
-	/// @name Virtual Overrides for io::Component
+	/// @name Virtual Overrides for skill::Element
 	/// @{
 
-	auto createIo(const io::IoClass &ioClass, plugin::SharedFactory<io::Io> &factory) -> std::shared_ptr<io::Io> final;
+	auto createChildElement(const skill::Element::Class &elementClass, skill::ElementFactory &factory)
+		-> std::shared_ptr<skill::Element> final;
 
-	auto createIoBatch(const io::IoBatchClass &ioClass, plugin::SharedFactory<io::IoBatch> &factory) -> std::shared_ptr<io::IoBatch> final;
-
-	auto resolveAttribute(std::string_view name) -> const model::Attribute * final;
+	auto forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool final;
 	
-	auto resolveTask(std::string_view name) -> std::shared_ptr<process::Task> final;
+	auto forEachEvent(const model::ForEachEventFunction &function) -> bool final;
 
-	auto resolveEvent(std::string_view name) -> std::shared_ptr<process::Event> final;
+	auto forEachTask(const model::ForEachTaskFunction &function) -> bool final;
 
-	auto readHandle(const model::Attribute &attribute) const noexcept -> data::ReadHandle final;
+	auto makeReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle> final;
 
 	auto realize() -> void final;
 
 	/// @}
 
 protected:
-	/// @name Virtual Overrides for io::Component
+	/// @name Virtual Overrides for skill::Element
 	/// @{
 
 	auto loadConfig(const ConfigIntializer &initializer,
 		utils::json::decoder::Object &jsonObject,
 		config::Resolver &resolver,
-		const FallbackConfigHandler &fallbackHandler) -> void final;
+		const config::FallbackHandler &fallbackHandler) -> void final;
 
 	/// @}
 

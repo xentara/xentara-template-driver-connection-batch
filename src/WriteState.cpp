@@ -2,6 +2,7 @@
 #include "WriteState.hpp"
 
 #include "Attributes.hpp"
+#include "Events.hpp"
 
 #include <xentara/memory/WriteSentinel.hpp>
 
@@ -12,33 +13,25 @@ namespace xentara::plugins::templateDriver
 
 using namespace std::literals;
 
-auto WriteState::resolveAttribute(std::string_view name) -> const model::Attribute *
+auto WriteState::forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool
 {
-	// Check all the attributes we support
-	return model::Attribute::resolve(name,
-		model::Attribute::kWriteTime,
-		attributes::kWriteError);
+	// Handle all the attributes we support
+	return
+		function(model::Attribute::kWriteTime) ||
+		function(attributes::kWriteError);
 }
 
-auto WriteState::resolveEvent(std::string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>
+auto WriteState::forEachEvent(const model::ForEachEventFunction &function, std::shared_ptr<void> parent) -> bool
 {
-	// Check all the events we support
-	if (name == "written"sv)
-	{
-		return std::shared_ptr<process::Event>(parent, &_writtenEvent);
-	}
-	else if (name == "writeError"sv)
-	{
-		return std::shared_ptr<process::Event>(parent, &_writeErrorEvent);
-	}
-
-	// The event name is not known
-	return nullptr;
+	// Handle all the events we support
+	return
+		function(events::kWritten, std::shared_ptr<process::Event>(parent, &_writtenEvent)) ||
+		function(attributes::kWriteError, std::shared_ptr<process::Event>(parent, &_writeErrorEvent));
 }
 
-auto WriteState::readHandle(const DataBlock &dataBlock, const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
+auto WriteState::makeReadHandle(const DataBlock &dataBlock, const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
 {
-	// Try reach readable attribute
+	// Try each readable attribute
 	if (attribute == model::Attribute::kWriteTime)
 	{
 		return dataBlock.member(_stateHandle, &State::_writeTime);

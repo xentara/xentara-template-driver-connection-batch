@@ -11,11 +11,10 @@
 #include "ReadTask.hpp"
 #include "WriteTask.hpp"
 
-#include <xentara/io/IoBatch.hpp>
-#include <xentara/io/IoBatchClass.hpp>
 #include <xentara/memory/Array.hpp>
-#include <xentara/plugin/EnableSharedFromThis.hpp>
 #include <xentara/process/Event.hpp>
+#include <xentara/skill/Element.hpp>
+#include <xentara/skill/EnableSharedFromThis.hpp>
 #include <xentara/utils/core/Uuid.hpp>
 #include <xentara/utils/eh/expected.hpp>
 
@@ -31,9 +30,9 @@ using namespace std::literals;
 class AbstractInput;
 class AbstractOutput;
 
-/// @brief A class representing a specific type of I/O batch.
+/// @brief A class representing a specific type of batch transaction.
 /// @todo rename this class to something more descriptive
-class TemplateIoBatch final : public io::IoBatch, public TemplateIoComponent::ErrorSink, public plugin::EnableSharedFromThis<TemplateIoBatch>
+class TemplateBatchTransaction final : public skill::Element, public TemplateIoComponent::ErrorSink, public skill::EnableSharedFromThis<TemplateBatchTransaction>
 {
 private:
 	/// @brief A structure used to store the class specific attributes within an element's configuration
@@ -44,7 +43,7 @@ private:
 	
 public:
 	/// @brief The class object containing meta-information about this element type
-	class Class final : public io::IoBatchClass
+	class Class final : public skill::Element::Class
 	{
 	public:
 		/// @brief Gets the global object
@@ -65,13 +64,13 @@ public:
 		auto name() const -> std::string_view final
 		{
 			/// @todo change class name
-			return "TemplateIoBatch"sv;
+			return "TemplateBatchTransaction"sv;
 		}
 	
 		auto uuid() const -> utils::core::Uuid final
 		{
 			/// @todo assign a unique UUID
-			return "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"_uuid;
+			return "deadbeef-dead-beef-dead-beefdeadbeef"_uuid;
 		}
 
 		/// @}
@@ -85,7 +84,7 @@ public:
 	};
 
 	/// @brief This constructor attaches the batch to its I/O component
-	TemplateIoBatch(std::reference_wrapper<TemplateIoComponent> ioComponent) :
+	TemplateBatchTransaction(std::reference_wrapper<TemplateIoComponent> ioComponent) :
 		_ioComponent(ioComponent)
 	{
 		ioComponent.get().addErrorSink(*this);
@@ -94,20 +93,20 @@ public:
 	/// @brief Adds an input to be processed by the batch
 	auto addInput(std::reference_wrapper<AbstractInput> input) -> void;
 
-	/// @brief Resolves an attribute that belong to the common read state.
-	/// @param name The name of the attribute to resolve
-	/// @return The attribute, or nullptr if the read state doesn't have an attribute with this name
-	auto resolveReadStateAttribute(std::string_view name) -> const model::Attribute *;
+	/// @brief Iterates over all the attributes that belong to the common read state.
+	/// @param function The function that should be called for each attribute
+	/// @return The return value of the last function call
+	auto forEachReadStateAttribute(const model::ForEachAttributeFunction &function) const -> bool;
 
-	/// @brief Resolves an event that belong to the common read state.
-	/// @param name The name of the event to resolve
-	/// @return The event, or nullptr if the read state doesn't have an event with this name
-	auto resolveReadStateEvent(std::string_view name) -> std::shared_ptr<process::Event>;
+	/// @brief Iterates over all the events that belong to the common read state.
+	/// @param function The function that should be called for each event
+	/// @return The return value of the last function call
+	auto forEachReadStateEvent(const model::ForEachEventFunction &function) -> bool;
 
 	/// @brief Creates a read-handle for an attribute that belong to the common read state.
 	/// @param attribute The attribute to create the handle for
 	/// @return A read handle for the attribute, or std::nullopt if the read state doesn't know the attribute
-	auto readStateReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>;
+	auto makeReadStateReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>;
 
 	/// @brief Gets the data block that holds the data for the read operations
 	constexpr auto readDataBlock() noexcept -> DataBlock &
@@ -134,16 +133,16 @@ public:
 		return _writeDataBlock;
 	}
 	
-	/// @name Virtual Overrides for io::IoBatch
+	/// @name Virtual Overrides for skill::Element
 	/// @{
 
-	auto resolveAttribute(std::string_view name) -> const model::Attribute * final;
+	auto forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool final;
 	
-	auto resolveTask(std::string_view name) -> std::shared_ptr<process::Task> final;
+	auto forEachEvent(const model::ForEachEventFunction &function) -> bool final;
 
-	auto resolveEvent(std::string_view name) -> std::shared_ptr<process::Event> final;
+	auto forEachTask(const model::ForEachTaskFunction &function) -> bool final;
 
-	auto readHandle(const model::Attribute &attribute) const noexcept -> data::ReadHandle final;
+	auto makeReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle> final;
 
 	auto realize() -> void final;
 
@@ -159,20 +158,20 @@ public:
 	/// @}
 
 protected:
-	/// @name Virtual Overrides for io::IoBatch
+	/// @name Virtual Overrides for skill::Element
 	/// @{
 
 	auto loadConfig(const ConfigIntializer &initializer,
 		utils::json::decoder::Object &jsonObject,
 		config::Resolver &resolver,
-		const FallbackConfigHandler &fallbackHandler) -> void final;
+		const config::FallbackHandler &fallbackHandler) -> void final;
 
 	/// @}
 
 private:
 	// The tasks need access to out private member functions
-	friend class ReadTask<TemplateIoBatch>;
-	friend class WriteTask<TemplateIoBatch>;
+	friend class ReadTask<TemplateBatchTransaction>;
+	friend class WriteTask<TemplateBatchTransaction>;
 
 	/// @brief This function is forwarded to the I/O component.
 	auto requestConnect(std::chrono::system_clock::time_point timeStamp) noexcept -> void
@@ -222,7 +221,7 @@ private:
 	/// @todo give this a more descriptive name, e.g. "_device"
 	std::reference_wrapper<TemplateIoComponent> _ioComponent;
 
-	/// @class xentara::plugins::templateDriver::TemplateIoBatch
+	/// @class xentara::plugins::templateDriver::TemplateBatchTransaction
 	/// @todo Split read and write command split into several commands each, if necessary.
 	/// 
 	/// @todo Some Some I/O components may need to have the read and write command split into several commands each.
@@ -238,7 +237,7 @@ private:
 	/// @brief The read command to send, or nullptr if it hasn't been constructed yet.
 	std::unique_ptr<ReadCommand> _readCommand;
 
-	/// @class xentara::plugins::templateDriver::TemplateIoBatch
+	/// @class xentara::plugins::templateDriver::TemplateBatchTransaction
 	/// @note There is no member for the write command, as the write command is constructed on-the-fly,
 	/// depending on which outputs wave to be written.
 
@@ -258,9 +257,9 @@ private:
 	WriteState _writeState;
 
 	/// @brief The "read" task
-	ReadTask<TemplateIoBatch> _readTask { *this };
+	ReadTask<TemplateBatchTransaction> _readTask { *this };
 	/// @brief The "write" task
-	WriteTask<TemplateIoBatch> _writeTask { *this };
+	WriteTask<TemplateBatchTransaction> _writeTask { *this };
 
 	/// @brief Preallocated runtime buffers
 	///
@@ -276,7 +275,7 @@ private:
 		OutputList _outputsToNotify;
 	} _runtimeBuffers;
 
-	/// @class xentara::plugins::templateDriver::TemplateIoBatch::RuntimeBufferSentinel
+	/// @class xentara::plugins::templateDriver::TemplateBatchTransaction::RuntimeBufferSentinel
 	/// @brief A sentinel that performs initialization and cleanup of a runtime buffer
 	template <typename Buffer>
 	class RuntimeBufferSentinel;

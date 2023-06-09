@@ -2,6 +2,7 @@
 #include "CommonReadState.hpp"
 
 #include "Attributes.hpp"
+#include "Events.hpp"
 
 #include <xentara/memory/WriteSentinel.hpp>
 
@@ -12,35 +13,27 @@ namespace xentara::plugins::templateDriver
 
 using namespace std::literals;
 
-auto CommonReadState::resolveAttribute(std::string_view name) -> const model::Attribute *
+auto CommonReadState::forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool
 {
-	// Check all the attributes we support
-	return model::Attribute::resolve(name,
-		model::Attribute::kUpdateTime,
-		model::Attribute::kQuality,
-		attributes::kError);
+	// Handle all the attributes we support
+	return
+		function(model::Attribute::kUpdateTime) ||
+		function(model::Attribute::kQuality) ||
+		function(attributes::kError);
 }
 
-auto CommonReadState::resolveEvent(std::string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>
+auto CommonReadState::forEachEvent(const model::ForEachEventFunction &function, std::shared_ptr<void> parent) -> bool
 {
-	// Check all the events we support
-	if (name == "read"sv)
-	{
-		return std::shared_ptr<process::Event>(parent, &_readEvent);
-	}
-	else if (name == model::Attribute::kQuality)
-	{
-		return std::shared_ptr<process::Event>(parent, &_qualityChangedEvent);
-	}
-
-	// The event name is not known
-	return nullptr;
+	// Handle all the events we support
+	return
+		function(events::kRead, std::shared_ptr<process::Event>(parent, &_readEvent)) ||
+		function(model::Attribute::kQuality, std::shared_ptr<process::Event>(parent, &_qualityChangedEvent));
 }
 
-auto CommonReadState::readHandle(const DataBlock &dataBlock,
+auto CommonReadState::makeReadHandle(const DataBlock &dataBlock,
 	const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
 {
-	// Try reach readable attribute
+	// Try each readable attribute
 	if (attribute == model::Attribute::kUpdateTime)
 	{
 		return dataBlock.member(_stateHandle, &State::_updateTime);

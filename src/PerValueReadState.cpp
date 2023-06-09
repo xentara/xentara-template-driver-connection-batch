@@ -9,35 +9,27 @@ namespace xentara::plugins::templateDriver
 {
 
 template <std::regular DataType>
-auto PerValueReadState<DataType>::resolveAttribute(std::string_view name) -> const model::Attribute *
+auto PerValueReadState<DataType>::forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool
 {
-	// Check all the attributes we support
-	return model::Attribute::resolve(name,
-		model::Attribute::kChangeTime);
+	// Handle all the attributes we support
+	return
+		function(model::Attribute::kChangeTime);
 }
 
 template <std::regular DataType>
-auto PerValueReadState<DataType>::resolveEvent(std::string_view name, std::shared_ptr<void> parent) -> std::shared_ptr<process::Event>
+auto PerValueReadState<DataType>::forEachEvent(const model::ForEachEventFunction &function, std::shared_ptr<void> parent) -> bool
 {
-	// Check all the events we support
-	if (name == model::Attribute::kValue)
-	{
-		return std::shared_ptr<process::Event>(parent, &_valueChangedEvent);
-	}
-	else if (name == process::Event::kChanged)
-	{
-		return std::shared_ptr<process::Event>(parent, &_changedEvent);
-	}
-
-	// The event name is not known
-	return nullptr;
+	// Handle all the events we support
+	return
+		function(model::Attribute::kValue, std::shared_ptr<process::Event>(parent, &_valueChangedEvent)) ||
+		function(process::Event::kChanged, std::shared_ptr<process::Event>(parent, &_changedEvent));
 }
 
 template <std::regular DataType>
-auto PerValueReadState<DataType>::readHandle(const DataBlock &dataBlock,
+auto PerValueReadState<DataType>::makeReadHandle(const DataBlock &dataBlock,
 	const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
 {
-	// Try reach readable attribute
+	// Try each readable attribute
 	if (attribute == model::Attribute::kChangeTime)
 	{
 		return dataBlock.member(_stateHandle, &State::_changeTime);

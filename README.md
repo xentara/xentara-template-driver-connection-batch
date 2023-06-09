@@ -2,8 +2,8 @@
 
 This repository contains skeleton code for a Xentara driver with the following features:
 
-Connection based | Batch processing | Polymorphic I/O Points
-:--------------: | :--------------: | :--------------------:
+Connection based | Batch processing | Polymorphic Data Points
+:--------------: | :--------------: | :---------------------:
 YES              | YES              | NO
 
 ## Prerequisites
@@ -50,10 +50,10 @@ The template code has the following features:
 
 - The connection to the physical device is established during the [pre-operational stage](https://docs.xentara.io/xentara/xentara_operational_stages.html#xentara_operational_stages_pre_operational),
   and closed during the [post-operational stage](https://docs.xentara.io/xentara/xentara_operational_stages.html#xentara_operational_stages_post_operational).
-- The [quality](https://docs.xentara.io/xentara/xentara_io_points.html#xentara_io_points_quality) of all I/O points belonging to the component
+- The [quality](https://docs.xentara.io/xentara/xentara_quality.html) of all skill data points belonging to the component
   is set to *Bad* if communication to the physical device breaks down.
 - The I/O component tracks an error code for the communication with the physical device. If communication breaks down, this error code is pushed
-  to the I/O batch and, from there, to the individual I/O points.
+  to the batch transaction and, from there, to the individual skill data points.
 - The I/O component publishes a [Xentara task](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_tasks) called *reconnect*,
   that checks the connection to the physical device, and attempts to reconnect if the communication has broken down.
 - The I/O component publishes two [Xentara events](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) called *connected*
@@ -61,70 +61,70 @@ The template code has the following features:
 
 ## Xentara I/O Batch Template
 
-*(See [I/O Batches](https://docs.xentara.io/xentara/xentara_io_batches.html) in the [Xentara documentation](https://docs.xentara.io/xentara/))*
+*(See [Batch Transactions](https://docs.xentara.io/xentara/xentara_batch_transactions.html) in the [Xentara documentation](https://docs.xentara.io/xentara/))*
 
-[src/TemplateIoBatch.hpp](src/TemplateIoBatch.hpp)  
-[src/TemplateIoBatch.cpp](src/TemplateIoBatch.cpp)
+[src/TemplateBatchTransaction.hpp](src/TemplateBatchTransaction.hpp)  
+[src/TemplateBatchTransaction.cpp](src/TemplateBatchTransaction.cpp)
 
-The I/O batch template provides template code for a batch communications request that can read and write multiple I/O points at the same time.
+The batch transaction template provides template code for a batch communications request that can read and write multiple skill data points at the same time.
 
 The template code has the following features:
 
-- All I/O points attached to an I/O batch share common [Xentara attributes](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_attributes)
-  for update time, [quality](https://docs.xentara.io/xentara/xentara_io_points.html#xentara_io_points_quality) and error code, which are maintained
-  centrally in the I/O batch. These attributes are then inherited by the I/O points, so that they can be accessed as attributes of the I/O point as well.
-- The I/O batch publishes a [Xentara task](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_tasks) called *read*,
-  which acquires the current values of all I/O points from the physical device using a read command.
-- The I/O batch publishes a [Xentara event](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) to signal changes
-  to the [quality](https://docs.xentara.io/xentara/xentara_io_points.html#xentara_io_points_quality). This event
-  is inherited by the I/O points, so that it can be accessed through the I/O points as well.
-- The I/O batch publishes a [Xentara task](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_tasks) called *write*,
+- All skill data points attached to a batch transaction share common [Xentara attributes](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_attributes)
+  for update time, [quality](https://docs.xentara.io/xentara/xentara_quality.html) and error code, which are maintained
+  centrally in the batch transaction. These attributes are then inherited by the skill data points, so that they can be accessed as attributes of the skill data point as well.
+- The batch transaction publishes a [Xentara task](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_tasks) called *read*,
+  which acquires the current values of all skill data points from the physical device using a read command.
+- The batch transaction publishes a [Xentara event](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) to signal changes
+  to the [quality](https://docs.xentara.io/xentara/xentara_quality.html). This event
+  is inherited by the skill data points, so that it can be accessed through the skill data points as well.
+- The batch transaction publishes a [Xentara task](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_tasks) called *write*,
   that checks which outputs have pending output values, and writes those outputs to the physical device using a write command (if there are any).
-- The I/O batch publishes [Xentara events](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) to signal if
-  a write command was sent, or if a write error occurred. These events are *not* inherited by the I/O points, who have their own individual events instead.
+- The batch transaction publishes [Xentara events](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) to signal if
+  a write command was sent, or if a write error occurred. These events are *not* inherited by the skill data points, who have their own individual events instead.
   This is done so that the events of the individual outputs can be fired individually for only those outputs that were actually written.
-- If a communication breakdown is detected during a read command, the I/O component is notified, and all I/O points in this or all other I/O batches
+- If a communication breakdown is detected during a read command, the I/O component is notified, and all skill data points in this or all other batch transactions
   are invalidated.
 - No communication with the physical device is attempted if the connection is not up.
 
-## Xentara I/O Point Templates
+## Xentara Skill Data Point Templates
 
-*(See [I/O Points](https://docs.xentara.io/xentara/xentara_io_points.html) in the [Xentara documentation](https://docs.xentara.io/xentara/))*
+*(See [Skill Data Points](https://docs.xentara.io/xentara/xentara_skill_data_points.html) in the [Xentara documentation](https://docs.xentara.io/xentara/))*
 
 ### Input Template
 
 [src/TemplateInput.hpp](src/TemplateInput.hpp)  
 [src/TemplateInput.cpp](src/TemplateInput.cpp)  
 
-The input template provides template code for a read-only I/O point whose value is read using an I/O batch.
+The input template provides template code for a read-only skill data point whose value is read using a batch transaction.
 
 The template code has the following features:
 
 - The input inherits [Xentara attributes](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_attributes)
-  for update time, [quality](https://docs.xentara.io/xentara/xentara_io_points.html#xentara_io_points_quality) and error code from the
-  I/O batch, and shares them with all other I/O points belonging to the same I/O batch.
+  for update time, [quality](https://docs.xentara.io/xentara/xentara_quality.html) and error code from the
+  batch transaction, and shares them with all other skill data points belonging to the same batch transaction.
 - The input publishes [Xentara events](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) to signal changes
-  to the value and [quality](https://docs.xentara.io/xentara/xentara_io_points.html#xentara_io_points_quality). The event to signal
-  a change in quality is inherited from the I/O batch, and shared with all other I/O points belonging to the same I/O batch.
+  to the value and [quality](https://docs.xentara.io/xentara/xentara_quality.html). The event to signal
+  a change in quality is inherited from the batch transaction, and shared with all other skill data points belonging to the same batch transaction.
 
 ### Output Template
 
 [src/TemplateOutput.hpp](src/TemplateOutput.hpp)  
 [src/TemplateOutput.cpp](src/TemplateOutput.cpp)
 
-The output template provides template code for a read/write I/O point whose value must be read and written using individual commands for each output.
+The output template provides template code for a read/write skill data point whose value must be read and written using individual commands for each output.
 
 The template code has the following features:
 
 - The input and output values are handled entirely separately. A written output value is not reflected in the input value until
-  it has been read back from the I/O component by the I/O batch. This is necessary because the I/O component might reject or
+  it has been read back from the I/O component by the batch transaction. This is necessary because the I/O component might reject or
   modify the written value.
-- The value of the output is not sent to the I/O component directly when it is written, but placed in a queue to be written by the I/O batch.
+- The value of the output is not sent to the I/O component directly when it is written, but placed in a queue to be written by the batch transaction.
 - The output inherits [Xentara attributes](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_attributes)
-  for update time, [quality](https://docs.xentara.io/xentara/xentara_io_points.html#xentara_io_points_quality) and error code from the
-  I/O batch, and shares them with all other I/O points belonging to the same I/O batch.
+  for update time, [quality](https://docs.xentara.io/xentara/xentara_quality.html) and error code from the
+  batch transaction, and shares them with all other skill data points belonging to the same batch transaction.
 - The output publishes [Xentara events](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) to signal changes
-  to the value and [quality](https://docs.xentara.io/xentara/xentara_io_points.html#xentara_io_points_quality). The event to signal
-  a change in quality is inherited from the I/O batch, and shared with all other I/O points belonging to the same I/O batch.
+  to the value and [quality](https://docs.xentara.io/xentara/xentara_quality.html). The event to signal
+  a change in quality is inherited from the batch transaction, and shared with all other skill data points belonging to the same batch transaction.
 - The output publishes [Xentara events](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) to signal if
   a new value was written, or if a write error occurred.

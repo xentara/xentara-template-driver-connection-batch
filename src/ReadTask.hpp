@@ -10,7 +10,7 @@
 namespace xentara::plugins::templateDriver
 {
 
-/// @brief This class providing callbacks for the Xentara scheduler for the "read" task of I/O points
+/// @brief This class providing callbacks for the Xentara scheduler for the "read" task of batch transactions
 template <typename Target>
 class ReadTask final : public process::Task
 {

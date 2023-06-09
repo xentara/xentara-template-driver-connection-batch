@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.25)
 
 # TODO: rename project and add description, URL etc.
 project(xentara-template-driver	LANGUAGES CXX)
@@ -28,8 +28,8 @@ add_library(
 	"src/CommonReadState.hpp"
 	"src/CustomError.cpp"
 	"src/CustomError.hpp"
-	"src/Driver.cpp"
-	"src/Driver.hpp"
+	"src/Events.cpp"
+	"src/Events.hpp"
 	"src/PerValueReadState.cpp"
 	"src/PerValueReadState.hpp"
 	"src/Plugin.cpp"
@@ -37,10 +37,14 @@ add_library(
 	"src/ReadCommand.hpp"
 	"src/ReadTask.hpp"
 	"src/SingleValueQueue.hpp"
+	"src/Skill.cpp"
+	"src/Skill.hpp"
+	"src/Tasks.cpp"
+	"src/Tasks.hpp"
+	"src/TemplateBatchTransaction.cpp"
+	"src/TemplateBatchTransaction.hpp"
 	"src/TemplateInput.cpp"
 	"src/TemplateInput.hpp"
-	"src/TemplateIoBatch.cpp"
-	"src/TemplateIoBatch.hpp"
 	"src/TemplateIoComponent.cpp"
 	"src/TemplateIoComponent.hpp"
 	"src/TemplateOutput.cpp"

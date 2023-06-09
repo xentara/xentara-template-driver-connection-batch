@@ -16,13 +16,13 @@ namespace xentara::plugins::templateDriver
 
 class WriteCommand;
 
-/// @brief Base class for outputs that can be written by an I/O batch
+/// @brief Base class for outputs that can be written by a batch transaction
 class AbstractOutput
 {
 public:
 	/// @brief Virtual destructor
 	/// @note The destructor is pure virtual (= 0) to ensure that this class will remain abstract, even if we should remove all
-	/// other pure virtual functions later. This is not necessary, of course, but prefents the abstract class from becoming
+	/// other pure virtual functions later. This is not necessary, of course, but prevents the abstract class from becoming
 	/// instantiable by accident as a result of refactoring.
 	virtual ~AbstractOutput() = 0;
 
@@ -30,7 +30,7 @@ public:
 	/// @todo give this a more descriptive name, e.g. "_device"
 	virtual auto ioComponent() const -> const TemplateIoComponent & = 0;
 		
-	/// @brief Attaches the output to its I/O batch
+	/// @brief Attaches the output to its batch transaction
 	/// @param dataArray The data array that the attributes should be added to. The caller will use the information in this array
 	/// to allocate the data block.
 	/// @param eventCount A variable that counts the total number of events than can be fired for a single update.

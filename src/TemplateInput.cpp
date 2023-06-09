@@ -2,13 +2,16 @@
 #include "TemplateInput.hpp"
 
 #include "Attributes.hpp"
-#include "TemplateIoBatch.hpp"
+#include "TemplateBatchTransaction.hpp"
 
+#include <xentara/config/FallbackHandler.hpp>
 #include <xentara/config/Resolver.hpp>
 #include <xentara/data/DataType.hpp>
 #include <xentara/data/ReadHandle.hpp>
 #include <xentara/memory/WriteSentinel.hpp>
 #include <xentara/model/Attribute.hpp>
+#include <xentara/model/ForEachAttributeFunction.hpp>
+#include <xentara/model/ForEachEventFunction.hpp>
 #include <xentara/utils/json/decoder/Object.hpp>
 #include <xentara/utils/json/decoder/Errors.hpp>
 
@@ -24,7 +27,7 @@ const model::Attribute TemplateInput::kValueAttribute { model::Attribute::kValue
 auto TemplateInput::loadConfig(const ConfigIntializer &initializer,
 		utils::json::decoder::Object &jsonObject,
 		config::Resolver &resolver,
-		const FallbackConfigHandler &fallbackHandler) -> void
+		const config::FallbackHandler &fallbackHandler) -> void
 {
 	// Get a reference that allows us to modify our own config attributes
     auto &&configAttributes = initializer[Class::instance().configHandle()];
@@ -34,12 +37,12 @@ auto TemplateInput::loadConfig(const ConfigIntializer &initializer,
 	for (auto && [name, value] : jsonObject)
     {
 		/// @todo use a more descriptive keyword, e.g. "poll"
-		if (name == "ioBatch"sv)
+		if (name == "batchTransaction"sv)
 		{
-			resolver.submit<TemplateIoBatch>(value, [this](std::reference_wrapper<TemplateIoBatch> ioBatch)
+			resolver.submit<TemplateBatchTransaction>(value, [this](std::reference_wrapper<TemplateBatchTransaction> batchTransaction)
 				{ 
-					_ioBatch = &ioBatch.get();
-					ioBatch.get().addInput(*this);
+					_batchTransaction = &batchTransaction.get();
+					batchTransaction.get().addInput(*this);
 				});
 			ioBatchLoaded = true;
 		}
@@ -66,11 +69,11 @@ auto TemplateInput::loadConfig(const ConfigIntializer &initializer,
 		}
     }
 
-	// Make sure that an I/O batch was specified
+	// Make sure that a batch transaction was specified
 	if (!ioBatchLoaded)
 	{
-		/// @todo replace "I/O batch" and "template input" with more descriptive names
-		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("missing I/O batch in template input"));
+		/// @todo replace "batch transaction" and "template input" with more descriptive names
+		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("missing batch transaction in template input"));
 	}
 	/// @todo perform consistency and completeness checks
 	if (!"TODO")
@@ -90,74 +93,56 @@ auto TemplateInput::directions() const -> io::Directions
 	return io::Direction::Input;
 }
 
-auto TemplateInput::resolveAttribute(std::string_view name) -> const model::Attribute *
+auto TemplateInput::forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool
 {
-	// resolveAttribute() must not be called before references have been resolved, so the I/O batch should have been
+	// forEachAttribute() must not be called before references have been resolved, so the batch transaction should have been
 	// set already.
-	if (!_ioBatch) [[unlikely]]
+	if (!_batchTransaction) [[unlikely]]
 	{
-		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateInput::resolveAttribute() called before cross references have been resolved");
+		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateInput::forEachAttribute() called before cross references have been resolved");
 	}
 
-	// Check all the attributes we support directly
-	if (auto attribute = model::Attribute::resolve(name,
-		kValueAttribute))
-	{
-		return attribute;
-	}
+	return
+		// Handle all the attributes we support directly
+		function(kValueAttribute) ||
 
-	// Check the state attributes
-	if (auto attribute = _state.resolveAttribute(name))
-	{
-		return attribute;
-	}
-	// Also check the common read state attributes from the I/O batch
-	if (auto attribute = _ioBatch->resolveReadStateAttribute(name))
-	{
-		return attribute;
-	}
+		// Handle the state attributes
+		_state.forEachAttribute(function) ||
+		// Also handle the common read state attributes from the batch transaction
+		_batchTransaction->forEachReadStateAttribute(function);
 
-	/// @todo add any additional attributes this class supports, including attributes inherited from the I/O component and the I/O batch
-
-	return nullptr;
+	/// @todo handle any additional attributes this class supports, including attributes inherited from the I/O component and the batch transaction
 }
 
-auto TemplateInput::resolveEvent(std::string_view name) -> std::shared_ptr<process::Event>
+auto TemplateInput::forEachEvent(const model::ForEachEventFunction &function) -> bool
 {
-	// resolveEvent() must not be called before references have been resolved, so the I/O batch should have been
+	// forEachEvent() must not be called before references have been resolved, so the batch transaction should have been
 	// set already.
-	if (!_ioBatch) [[unlikely]]
+	if (!_batchTransaction) [[unlikely]]
 	{
-		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateInput::resolveEvent() called before cross references have been resolved");
+		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateInput::forEachEvent() called before cross references have been resolved");
 	}
 
-	// Check the state events
-	if (auto event = _state.resolveEvent(name, sharedFromThis()))
-	{
-		return event;
-	}
-	// Also check the common read state events from the I/O batch
-	if (auto event = _ioBatch->resolveReadStateEvent(name))
-	{
-		return event;
-	}
+	return
+		// Handle the state events
+		_state.forEachEvent(function, sharedFromThis()) ||
+		// Also handle the common read state events from the batch transaction
+		_batchTransaction->forEachReadStateEvent(function);
 
-	/// @todo add any additional events this class supports, including events inherited from the I/O component and the I/O batch
-
-	return nullptr;
+	/// @todo handle any additional events this class supports, including events inherited from the I/O component and the batch transaction
 }
 
-auto TemplateInput::readHandle(const model::Attribute &attribute) const noexcept -> data::ReadHandle
+auto TemplateInput::makeReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
 {
-	// readHandle() must not be called before references have been resolved, so the I/O batch should have been
+	// makeReadHandle() must not be called before references have been resolved, so the batch transaction should have been
 	// set already.
-	if (!_ioBatch) [[unlikely]]
+	if (!_batchTransaction) [[unlikely]]
 	{
 		// Don't throw an exception, because this function is noexcept
 		return std::make_error_code(std::errc::invalid_argument);
 	}
 	// Get the data block
-	const auto &dataBlock = _ioBatch->readDataBlock();
+	const auto &dataBlock = _batchTransaction->readDataBlock();
 	
 	// Handle the value attribute separately
 	if (attribute == kValueAttribute)
@@ -165,20 +150,20 @@ auto TemplateInput::readHandle(const model::Attribute &attribute) const noexcept
 		return _state.valueReadHandle(dataBlock);
 	}
 	
-	// Check the state attributes
-	if (auto handle = _state.readHandle(dataBlock, attribute))
+	// Handle the state attributes
+	if (auto handle = _state.makeReadHandle(dataBlock, attribute))
 	{
-		return *handle;
+		return handle;
 	}
-	// Also check the common read state attributes from the I/O batch
-	if (auto handle = _ioBatch->readStateReadHandle(attribute))
+	// Also handle the common read state attributes from the batch transaction
+	if (auto handle = _batchTransaction->makeReadStateReadHandle(attribute))
 	{
-		return *handle;
+		return handle;
 	}
 
-	/// @todo add any additional readable attributes this class supports, including attributes inherited from the I/O component and the I/O batch
+	/// @todo handle any additional readable attributes this class supports, including attributes inherited from the I/O component and the batch transaction
 
-	return data::ReadHandle::Error::Unknown;
+	return std::nullopt;
 }
 
 auto TemplateInput::attachInput(memory::Array &dataArray, std::size_t &eventCount) -> void

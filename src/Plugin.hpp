@@ -1,7 +1,7 @@
 // Copyright (c) embedded ocean GmbH
 #pragma once
 
-#include "Driver.hpp"
+#include "Skill.hpp"
 
 #include <xentara/plugin/Plugin.hpp>
 
@@ -23,17 +23,17 @@ public:
 	/// @name Virtual Overrides for plugin::Plugin
 	/// @{
 
-	auto registerObjects(Registry & registry) -> void final
+	auto registerSkills(Registry & registry) -> void final
 	{
-		// Register the driver object.
-		registry << _driver;
+		// Register the skill class.
+		registry << _skillClass;
 	}
 	
 	/// @}
 
 private:
-	/// @brief The driver object
-	Driver _driver;
+	/// @brief The skill class object
+	Skill::Class _skillClass;
 
 	/// @brief The global plugin object
 	static Plugin _instance;
