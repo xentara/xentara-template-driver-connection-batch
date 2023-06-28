@@ -21,7 +21,6 @@ auto PerValueReadState<DataType>::forEachEvent(const model::ForEachEventFunction
 {
 	// Handle all the events we support
 	return
-		function(model::Attribute::kValue, std::shared_ptr<process::Event>(parent, &_valueChangedEvent)) ||
 		function(process::Event::kChanged, std::shared_ptr<process::Event>(parent, &_changedEvent));
 }
 
@@ -50,8 +49,8 @@ auto PerValueReadState<DataType>::attach(memory::Array &dataArray, std::size_t &
 	// Add the state to the array
 	_stateHandle = dataArray.appendObject<State>();
 
-	// Add the number of events that can be triggered at once, which is all of them.
-	eventCount += 2;
+	// Add the number of events that can be triggered at once, which is just the one event we have.
+	eventCount += 1;
 }
 
 template <std::regular DataType>
@@ -74,14 +73,10 @@ auto PerValueReadState<DataType>::update(
 	const auto changed = valueChanged || commonChanges;
 
 	// Update the change time, if necessary. We always need to write the change time, even if it is the same as before,
-	// because the memory resource might use swap-in.
+	// because memory resources use swap-in.
 	state._changeTime = changed ? timeStamp : oldState._changeTime;
 
 	// Cause the correct events to be fired
-	if (valueChanged)
-	{
-		eventsToFire.push_back(_valueChangedEvent);
-	}
 	if (changed)
 	{
 		eventsToFire.push_back(_changedEvent);

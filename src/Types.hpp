@@ -4,7 +4,7 @@
 #include <xentara/memory/Array.hpp>
 #include <xentara/memory/ArrayBlock.hpp>
 #include <xentara/memory/WriteSentinel.hpp>
-#include <xentara/process/Event.hpp>
+#include <xentara/process/EventList.hpp>
 #include <xentara/utils/core/FixedVector.hpp>
 
 namespace xentara::plugins::templateDriver
@@ -18,8 +18,8 @@ using DataBlock = memory::ArrayBlock;
 /// @brief This is the type used for the data blocks that hold the data for the inputs and the outputs
 using WriteSentinel = memory::WriteSentinel<memory::Array>;
 
-/// @brief This is the type used to hold the list of event to trigger
-using PendingEventList = utils::core::FixedVector<std::reference_wrapper<process::Event>>;
+/// @brief This is the type used to hold the list of events to trigger
+using PendingEventList = process::FixedEventList;
 
 /// @brief This is the type used to hold the list of outputs to notify
 using OutputList = utils::core::FixedVector<std::reference_wrapper<AbstractOutput>>;

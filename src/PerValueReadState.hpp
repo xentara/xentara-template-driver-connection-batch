@@ -91,8 +91,6 @@ private:
 		std::chrono::system_clock::time_point _changeTime { std::chrono::system_clock::time_point::min() };
 	};
 
-	/// @brief A Xentara event that is fired when the value changes
-	process::Event _valueChangedEvent { model::Attribute::kValue };
 	/// @brief A summary event that is fired when anything changes
 	process::Event _changedEvent { io::Direction::Input };
 

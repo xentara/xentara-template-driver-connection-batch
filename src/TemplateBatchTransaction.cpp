@@ -360,14 +360,8 @@ auto TemplateBatchTransaction::updateInputs(std::chrono::system_clock::time_poin
 		input.get().updateReadState(sentinel, timeStamp, payloadOrError, commonChanges, _runtimeBuffers._eventsToFire);
 	}
 
-	// Commit the data before sending the events
-	sentinel.commit();
-
-	// Fire the collected events
-	for (auto &&event : _runtimeBuffers._eventsToFire)
-	{
-		event.get().fire();
-	}
+	// Commit the data and raise the events
+	sentinel.commit(timeStamp, _runtimeBuffers._eventsToFire);
 }
 
 auto TemplateBatchTransaction::updateOutputs(std::chrono::system_clock::time_point timeStamp, std::error_code error, const OutputList &outputs) -> void
@@ -387,14 +381,8 @@ auto TemplateBatchTransaction::updateOutputs(std::chrono::system_clock::time_poi
 		output.get().updateWriteState(sentinel, timeStamp, error, _runtimeBuffers._eventsToFire);
 	}
 
-	// Commit the data before sending the events
-	sentinel.commit();
-
-	// Fire the collected events
-	for (auto &&event : _runtimeBuffers._eventsToFire)
-	{
-		event.get().fire();
-	}
+	// Commit the data and raise the events
+	sentinel.commit(timeStamp, _runtimeBuffers._eventsToFire);
 }
 
 } // namespace xentara::plugins::templateDriver

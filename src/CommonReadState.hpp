@@ -100,8 +100,6 @@ private:
 
 	/// @brief A Xentara event that is fired when the inputs were read (sucessfully or not)
 	process::Event _readEvent { io::Direction::Input };
-	/// @brief A Xentara event that is fired when the quality changes
-	process::Event _qualityChangedEvent { model::Attribute::kQuality };
 
 	/// @brief The array element that contains the state
 	memory::Array::ObjectHandle<State> _stateHandle;

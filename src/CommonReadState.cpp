@@ -26,8 +26,7 @@ auto CommonReadState::forEachEvent(const model::ForEachEventFunction &function, 
 {
 	// Handle all the events we support
 	return
-		function(events::kRead, std::shared_ptr<process::Event>(parent, &_readEvent)) ||
-		function(model::Attribute::kQuality, std::shared_ptr<process::Event>(parent, &_qualityChangedEvent));
+		function(events::kRead, std::shared_ptr<process::Event>(parent, &_readEvent));
 }
 
 auto CommonReadState::makeReadHandle(const DataBlock &dataBlock,
@@ -55,8 +54,8 @@ auto CommonReadState::attach(memory::Array &dataArray, std::size_t &eventCount) 
 	// Add the state to the array
 	_stateHandle = dataArray.appendObject<State>();
 
-	// Add the number of events that can be triggered at once, which is all of them.
-	eventCount += 2;
+	// Add the number of events that can be triggered at once, which is just the one event we have.
+	eventCount += 1;
 }
 
 auto CommonReadState::update(
@@ -95,10 +94,6 @@ auto CommonReadState::update(
 	if (error != CustomError::NoData)
 	{
 		eventsToFire.push_back(_readEvent);
-	}
-	if (changes._qualityChanged)
-	{
-		eventsToFire.push_back(_qualityChangedEvent);
 	}
 
 	return changes;
