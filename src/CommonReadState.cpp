@@ -54,7 +54,7 @@ auto CommonReadState::attach(memory::Array &dataArray, std::size_t &eventCount) 
 	// Add the state to the array
 	_stateHandle = dataArray.appendObject<State>();
 
-	// Add the number of events that can be triggered at once, which is just the one event we have.
+	// Add the number of events that can be raised at once, which is just the one event we have.
 	eventCount += 1;
 }
 
@@ -62,7 +62,7 @@ auto CommonReadState::update(
 		WriteSentinel &writeSentinel,
 		std::chrono::system_clock::time_point timeStamp,
 		std::error_code error,
-		PendingEventList &eventsToFire) -> Changes
+		PendingEventList &eventsToRaise) -> Changes
 {
 	// Get the correct array entry
 	auto &state = writeSentinel[_stateHandle];
@@ -90,10 +90,10 @@ auto CommonReadState::update(
 		._qualityChanged = state._quality != oldState._quality,
 		._errorChanged = state._error != oldState._error };
 
-	// Cause the correct events to be fired
+	// Cause the correct events to be raised
 	if (error != CustomError::NoData)
 	{
-		eventsToFire.push_back(_readEvent);
+		eventsToRaise.push_back(_readEvent);
 	}
 
 	return changes;

@@ -211,7 +211,7 @@ auto TemplateBatchTransaction::realize() -> void
 	_writeDataBlock.create(memory::memoryResources::data());
 
 	// Reserve space in the buffers
-	_runtimeBuffers._eventsToFire.reset(std::max(readEventCount, writeEventCount));
+	_runtimeBuffers._eventsToRaise.reset(std::max(readEventCount, writeEventCount));
 	_runtimeBuffers._outputsToNotify.reset(_outputs.size());
 }
 
@@ -293,7 +293,7 @@ auto TemplateBatchTransaction::performWriteTask(const process::ExecutionContext 
 auto TemplateBatchTransaction::write(std::chrono::system_clock::time_point timeStamp) -> void
 {
 	// Protect use of the list of outputs to notify
-	RuntimeBufferSentinel eventsToFireSentinel(_runtimeBuffers._outputsToNotify);
+	RuntimeBufferSentinel eventsToRaiseSentinel(_runtimeBuffers._outputsToNotify);
 
 	// Create a command
 	WriteCommand command;
@@ -346,43 +346,43 @@ auto TemplateBatchTransaction::updateInputs(std::chrono::system_clock::time_poin
 	-> void
 {
 	// Protect use of the pending event buffer
-	RuntimeBufferSentinel eventsToFireSentinel(_runtimeBuffers._eventsToFire);
+	RuntimeBufferSentinel eventsToRaiseSentinel(_runtimeBuffers._eventsToRaise);
 
 	// Make a write sentinel
 	memory::WriteSentinel sentinel { _readDataBlock };
 
 	// Update the common read state
-	const auto commonChanges = _readState.update(sentinel, timeStamp, payloadOrError.error(), _runtimeBuffers._eventsToFire);
+	const auto commonChanges = _readState.update(sentinel, timeStamp, payloadOrError.error(), _runtimeBuffers._eventsToRaise);
 
 	// Update all the inputs
 	for (auto &&input : _inputs)
 	{
-		input.get().updateReadState(sentinel, timeStamp, payloadOrError, commonChanges, _runtimeBuffers._eventsToFire);
+		input.get().updateReadState(sentinel, timeStamp, payloadOrError, commonChanges, _runtimeBuffers._eventsToRaise);
 	}
 
 	// Commit the data and raise the events
-	sentinel.commit(timeStamp, _runtimeBuffers._eventsToFire);
+	sentinel.commit(timeStamp, _runtimeBuffers._eventsToRaise);
 }
 
 auto TemplateBatchTransaction::updateOutputs(std::chrono::system_clock::time_point timeStamp, std::error_code error, const OutputList &outputs) -> void
 {
 	// Protect use of the pending event buffer
-	RuntimeBufferSentinel eventsToFireSentinel(_runtimeBuffers._eventsToFire);
+	RuntimeBufferSentinel eventsToRaiseSentinel(_runtimeBuffers._eventsToRaise);
 
 	// Make a write sentinel
 	memory::WriteSentinel sentinel { _readDataBlock };
 
 	// Update the latest state
-	_writeState.update(sentinel, timeStamp, error, _runtimeBuffers._eventsToFire);
+	_writeState.update(sentinel, timeStamp, error, _runtimeBuffers._eventsToRaise);
 
 	// Update all the relevant outputs
 	for (auto &&output : outputs)
 	{
-		output.get().updateWriteState(sentinel, timeStamp, error, _runtimeBuffers._eventsToFire);
+		output.get().updateWriteState(sentinel, timeStamp, error, _runtimeBuffers._eventsToRaise);
 	}
 
 	// Commit the data and raise the events
-	sentinel.commit(timeStamp, _runtimeBuffers._eventsToFire);
+	sentinel.commit(timeStamp, _runtimeBuffers._eventsToRaise);
 }
 
 } // namespace xentara::plugins::templateDriver

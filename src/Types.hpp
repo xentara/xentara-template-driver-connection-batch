@@ -18,7 +18,7 @@ using DataBlock = memory::ArrayBlock;
 /// @brief This is the type used for the data blocks that hold the data for the inputs and the outputs
 using WriteSentinel = memory::WriteSentinel<memory::Array>;
 
-/// @brief This is the type used to hold the list of events to trigger
+/// @brief This is the type used to hold the list of events to raise
 using PendingEventList = process::FixedEventList;
 
 /// @brief This is the type used to hold the list of outputs to notify

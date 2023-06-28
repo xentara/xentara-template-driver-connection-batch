@@ -49,7 +49,7 @@ auto WriteState::attach(memory::Array &dataArray, std::size_t &eventCount) -> vo
 	// Add the state to the array
 	_stateHandle = dataArray.appendObject<State>();
 
-	// Add the number of events that can be triggered at once.
+	// Add the number of events that can be raised at once.
 	// This is only one, not two, because _writtenEvent and _writeErrorEvent are mutually exclusive
 	eventCount += 1;
 }
@@ -57,7 +57,7 @@ auto WriteState::attach(memory::Array &dataArray, std::size_t &eventCount) -> vo
 auto WriteState::update(WriteSentinel &writeSentinel,
 		std::chrono::system_clock::time_point timeStamp,
 		std::error_code error,
-		PendingEventList &eventsToFire) -> void
+		PendingEventList &eventsToRaise) -> void
 {
 	// Get the correct array entry
 	auto &state = writeSentinel[_stateHandle];
@@ -66,14 +66,14 @@ auto WriteState::update(WriteSentinel &writeSentinel,
 	state._writeTime = timeStamp;
 	state._writeError = error;
 
-	// Cause the correct events to be fired
+	// Cause the correct events to be raised
 	if (!error)
 	{
-		eventsToFire.push_back(_writtenEvent);
+		eventsToRaise.push_back(_writtenEvent);
 	}
 	else
 	{
-		eventsToFire.push_back(_writeErrorEvent);
+		eventsToRaise.push_back(_writeErrorEvent);
 	}
 }
 

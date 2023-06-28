@@ -268,8 +268,8 @@ private:
 	/// which would not be real-time safe.
 	struct
 	{
-		/// @brief The list of events to trigger after a read or write
-		PendingEventList _eventsToFire;
+		/// @brief The list of events to raise after a read or write
+		PendingEventList _eventsToRaise;
 
 		/// @brief The outputs to notify after a write operation
 		OutputList _outputsToNotify;

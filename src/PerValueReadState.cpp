@@ -49,7 +49,7 @@ auto PerValueReadState<DataType>::attach(memory::Array &dataArray, std::size_t &
 	// Add the state to the array
 	_stateHandle = dataArray.appendObject<State>();
 
-	// Add the number of events that can be triggered at once, which is just the one event we have.
+	// Add the number of events that can be raised at once, which is just the one event we have.
 	eventCount += 1;
 }
 
@@ -59,7 +59,7 @@ auto PerValueReadState<DataType>::update(
 	std::chrono::system_clock::time_point timeStamp,
 	const utils::eh::expected<DataType, std::error_code> &valueOrError,
 	const CommonReadState::Changes &commonChanges,
-	PendingEventList &eventsToFire) -> void
+	PendingEventList &eventsToRaise) -> void
 {
 	// Get the correct array entry
 	auto &state = writeSentinel[_stateHandle];
@@ -76,10 +76,10 @@ auto PerValueReadState<DataType>::update(
 	// because memory resources use swap-in.
 	state._changeTime = changed ? timeStamp : oldState._changeTime;
 
-	// Cause the correct events to be fired
+	// Cause the correct events to be raised
 	if (changed)
 	{
-		eventsToFire.push_back(_changedEvent);
+		eventsToRaise.push_back(_changedEvent);
 	}
 }
 

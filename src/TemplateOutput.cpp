@@ -205,7 +205,7 @@ auto TemplateOutput::updateReadState(WriteSentinel &writeSentinel,
 	std::chrono::system_clock::time_point timeStamp,
 	const utils::eh::expected<std::reference_wrapper<const ReadCommand::Payload>, std::error_code> &payloadOrError,
 	const CommonReadState::Changes &commonChanges,
-	PendingEventList &eventsToFire) -> void
+	PendingEventList &eventsToRaise) -> void
 {
 	// Check if we have a valid payload
 	if (payloadOrError)
@@ -214,13 +214,13 @@ auto TemplateOutput::updateReadState(WriteSentinel &writeSentinel,
 		double value = {};
 
 		// Update the read state
-		_readState.update(writeSentinel, timeStamp, value, commonChanges, eventsToFire);
+		_readState.update(writeSentinel, timeStamp, value, commonChanges, eventsToRaise);
 	}
 	// We have an error
 	else
 	{
 		// Update the read state with the error
-		_readState.update(writeSentinel, timeStamp, utils::eh::unexpected(payloadOrError.error()), commonChanges, eventsToFire);
+		_readState.update(writeSentinel, timeStamp, utils::eh::unexpected(payloadOrError.error()), commonChanges, eventsToRaise);
 	}
 }
 
@@ -247,10 +247,10 @@ auto TemplateOutput::attachOutput(memory::Array &dataArray, std::size_t &eventCo
 auto TemplateOutput::updateWriteState(WriteSentinel &writeSentinel,
 	std::chrono::system_clock::time_point timeStamp,
 	std::error_code error,
-	PendingEventList &eventsToFire) -> void
+	PendingEventList &eventsToRaise) -> void
 {
 	// Update the write state
-	_writeState.update(writeSentinel, timeStamp, error, eventsToFire);
+	_writeState.update(writeSentinel, timeStamp, error, eventsToRaise);
 }
 
 } // namespace xentara::plugins::templateDriver

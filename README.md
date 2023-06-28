@@ -57,7 +57,7 @@ The template code has the following features:
 - The I/O component publishes a [Xentara task](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_tasks) called *reconnect*,
   that checks the connection to the physical device, and attempts to reconnect if the communication has broken down.
 - The I/O component publishes two [Xentara events](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) called *connected*
-  and *disconnected*, that are fired when the connection to the physical device is establed or lost.
+  and *disconnected*, that are raised when the connection to the physical device is establed or lost.
 
 ## Xentara I/O Batch Template
 
@@ -79,7 +79,7 @@ The template code has the following features:
   that checks which outputs have pending output values, and writes those outputs to the physical device using a write command (if there are any).
 - The batch transaction publishes [Xentara events](https://docs.xentara.io/xentara/xentara_element_members.html#xentara_events) to signal if
   a write command was sent, or if a write error occurred. These events are *not* inherited by the skill data points, who have their own individual events instead.
-  This is done so that the events of the individual outputs can be fired individually for only those outputs that were actually written.
+  This is done so that the events of the individual outputs can be raised individually for only those outputs that were actually written.
 - If a communication breakdown is detected during a read command, the I/O component is notified, and all skill data points in this or all other batch transactions
   are invalidated.
 - No communication with the physical device is attempted if the connection is not up.

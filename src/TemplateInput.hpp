@@ -106,7 +106,7 @@ public:
 		std::chrono::system_clock::time_point timeStamp,
 		const utils::eh::expected<std::reference_wrapper<const ReadCommand::Payload>, std::error_code> &payloadOrError,
 		const CommonReadState::Changes &commonChanges,
-		PendingEventList &eventsToFire) -> void final;
+		PendingEventList &eventsToRaise) -> void final;
 		
 	/// @}
 

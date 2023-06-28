@@ -7,9 +7,9 @@
 namespace xentara::plugins::templateDriver::events
 {
 
-/// @brief A Xentara event that is fired when a data point was read
+/// @brief A Xentara event that is raised when a data point was read
 extern const process::Event::Role kRead;
-/// @brief A Xentara event that is fired when a data point was written
+/// @brief A Xentara event that is raised when a data point was written
 extern const process::Event::Role kWritten;
 
 } // namespace xentara::plugins::templateDriver::events

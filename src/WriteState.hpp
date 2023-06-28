@@ -50,22 +50,22 @@ public:
 	/// @brief Attaches the state to a batch transaction
 	/// @param dataArray The data array that the attributes should be added to. The caller will use the information in this array
 	/// to allocate the data block.
-	/// @param eventCount A variable that counts the total number of events than can be fired for a single update.
-	/// The maximum number of events that update() will request to be fired will be added to this variable. The caller will use this
-	/// event count to preallocate a buffer when collecting the events to fire after an update.
+	/// @param eventCount A variable that counts the total number of events than can be raised for a single update.
+	/// The maximum number of events that update() will request to be raised will be added to this variable. The caller will use this
+	/// event count to preallocate a buffer when collecting the events to raise after an update.
 	auto attach(memory::Array &dataArray, std::size_t &eventCount) -> void;
 
 	/// @brief Updates the data and collects the events to send
 	/// @param writeSentinel A write sentinel for the data block the data is stored in
 	/// @param timeStamp The update time stamp
 	/// @param error The error code, or a default constructed std::error_code object if no error occurred
-	/// @param eventsToFire Any events that need to be fired as a result of the update will be added to this
-	/// list. The events will not be fired directly, because the write sentinel needs to be commited first,
+	/// @param eventsToRaise Any events that need to be raised as a result of the update will be added to this
+	/// list. The events will not be raised directly, because the write sentinel needs to be commited first,
 	/// which is done by the caller.
 	auto update(WriteSentinel &writeSentinel,
 		std::chrono::system_clock::time_point timeStamp,
 		std::error_code error,
-		PendingEventList &eventsToFire) -> void;
+		PendingEventList &eventsToRaise) -> void;
 
 private:
 	/// @brief This structure is used to represent the state inside the memory block
@@ -78,9 +78,9 @@ private:
 		std::error_code _writeError;
 	};
 
-	/// @brief A Xentara event that is fired when the value was successfully written
+	/// @brief A Xentara event that is raised when the value was successfully written
 	process::Event _writtenEvent { io::Direction::Output };
-	/// @brief A Xentara event that is fired when a write error occurred
+	/// @brief A Xentara event that is raised when a write error occurred
 	process::Event _writeErrorEvent { io::Direction::Output };
 
 	/// @brief The array element that contains the state
