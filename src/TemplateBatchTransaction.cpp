@@ -27,8 +27,6 @@ namespace xentara::plugins::templateDriver
 
 using namespace std::literals;
 
-TemplateBatchTransaction::Class TemplateBatchTransaction::Class::_instance;
-
 template <typename Buffer>
 class TemplateBatchTransaction::RuntimeBufferSentinel final
 {
@@ -50,14 +48,10 @@ private:
 	Buffer &_buffer;
 };
 
-auto TemplateBatchTransaction::loadConfig(const ConfigIntializer &initializer,
-		utils::json::decoder::Object &jsonObject,
-		config::Resolver &resolver,
-		const config::FallbackHandler &fallbackHandler) -> void
+auto TemplateBatchTransaction::load(utils::json::decoder::Object &jsonObject,
+	config::Resolver &resolver,
+	const config::FallbackHandler &fallbackHandler) -> void
 {
-	// Get a reference that allows us to modify our own config attributes
-    auto &&configAttributes = initializer[Class::instance().configHandle()];
-
 	// Go through all the members of the JSON object that represents this object
 	bool ioBatchLoaded = false;
 	for (auto && [name, value] : jsonObject)
@@ -75,7 +69,7 @@ auto TemplateBatchTransaction::loadConfig(const ConfigIntializer &initializer,
 				utils::json::decoder::throwWithLocation(value, std::runtime_error("TODO is wrong with TODO parameter of template batch transaction"));
 			}
 
-			/// @todo set the appropriate member variables, and update configAttributes accordingly (if necessary) 
+			/// @todo set the appropriate member variables
 		}
 		else
 		{

@@ -32,8 +32,6 @@ add_library(
 	"src/Events.hpp"
 	"src/PerValueReadState.cpp"
 	"src/PerValueReadState.hpp"
-	"src/Plugin.cpp"
-	"src/Plugin.hpp"
 	"src/ReadCommand.hpp"
 	"src/ReadTask.hpp"
 	"src/SingleValueQueue.hpp"

@@ -20,43 +20,6 @@ using namespace std::literals;
 class Skill final : public skill::Skill
 {
 public:
-	/// @brief The class object containing meta-information about this skill
-	class Class final : public skill::Skill::Class
-	{
-	public:
-		/// @name Virtual Overrides for skill::Skill::Class
-		/// @{
-
-		auto name() const -> std::string_view final
-		{
-			/// @todo change class name
-			return "TemplateDriver"sv;
-		}
-
-		auto uuid() const -> utils::core::Uuid final
-		{
-			/// @todo assign a unique UUID
-			return "deadbeef-dead-beef-dead-beefdeadbeef"_uuid;
-		}
-
-		auto registerElements(Registry &registry) -> void final
-		{
-			/// @todo register any additional element classes
-			registry <<
-				TemplateIoComponent::Class::instance() <<
-				TemplateBatchTransaction::Class::instance() <<
-				TemplateOutput::Class::instance() <<
-				TemplateInput::Class::instance();
-		}
-
-		auto createSkill() -> std::unique_ptr<skill::Skill> final
-		{
-			return std::make_unique<Skill>();
-		}
-	
-		/// @}
-	};
-
 	/// @class xentara::plugins::templateDriver::Skill
 	/// @todo add constructor to perform global initialization, if necessary
 
@@ -70,6 +33,21 @@ public:
 		-> std::shared_ptr<skill::Element> final;
 
 	/// @}
+
+private:
+	/// @brief The skill class
+	/// @todo change class name
+	/// @todo assign a unique UUID
+	using Class = ConcreteClass<Skill,
+		"TemplateDriver",
+		"deadbeef-dead-beef-dead-beefdeadbeef"_uuid,
+		TemplateIoComponent::Class,
+		TemplateBatchTransaction::Class,
+		TemplateOutput::Class,
+		TemplateInput::Class>;
+
+	/// @brief The skill class object
+	static Class _class;
 };
 
 } // namespace xentara::plugins::templateDriver
