@@ -6,6 +6,7 @@
 
 #include <xentara/memory/Array.hpp>
 #include <xentara/memory/ObjectBlock.hpp>
+#include <xentara/model/ElementCategory.hpp>
 #include <xentara/process/Event.hpp>
 #include <xentara/process/Task.hpp>
 #include <xentara/skill/Element.hpp>
@@ -128,7 +129,10 @@ public:
 
 	auto makeReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle> final;
 
-	auto realize() -> void final;
+	auto category() const noexcept -> model::ElementCategory final
+	{
+		return model::ElementCategory::Device;
+	}
 
 	/// @}
 
@@ -201,6 +205,8 @@ private:
 	/// @{
 
 	auto load(utils::json::decoder::Object &jsonObject, config::Context &context) -> void final;
+
+	auto realize() -> void final;
 
 	/// @}
 
