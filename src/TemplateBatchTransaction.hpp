@@ -22,6 +22,7 @@
 #include <string_view>
 #include <functional>
 #include <memory>
+#include <vector>
 
 namespace xentara::plugins::templateDriver
 {
@@ -192,9 +193,9 @@ private:
 	/// @}
 
 	/// @brief The list of inputs
-	std::list<std::reference_wrapper<AbstractInput>> _inputs;
+	std::vector<std::reference_wrapper<AbstractInput>> _inputs;
 	/// @brief The list of outputs
-	std::list<std::reference_wrapper<AbstractOutput>> _outputs;
+	std::vector<std::reference_wrapper<AbstractOutput>> _outputs;
 
 	/// @brief The read command to send, or nullptr if it hasn't been constructed yet.
 	std::unique_ptr<ReadCommand> _readCommand;
