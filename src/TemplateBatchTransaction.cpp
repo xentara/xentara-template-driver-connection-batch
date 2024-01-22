@@ -7,8 +7,8 @@
 #include "TemplateOutput.hpp"
 #include "WriteCommand.hpp"
 
-#include <xentara/config/FallbackHandler.hpp>
-#include <xentara/config/Resolver.hpp>
+#include <xentara/config/Context.hpp>
+#include <xentara/config/Errors.hpp>
 #include <xentara/data/ReadHandle.hpp>
 #include <xentara/data/WriteHandle.hpp>
 #include <xentara/memory/memoryResources.hpp>
@@ -48,9 +48,7 @@ private:
 	Buffer &_buffer;
 };
 
-auto TemplateBatchTransaction::load(utils::json::decoder::Object &jsonObject,
-	config::Resolver &resolver,
-	const config::FallbackHandler &fallbackHandler) -> void
+auto TemplateBatchTransaction::load(utils::json::decoder::Object &jsonObject, config::Context &context) -> void
 {
 	// Go through all the members of the JSON object that represents this object
 	bool ioBatchLoaded = false;
@@ -73,9 +71,7 @@ auto TemplateBatchTransaction::load(utils::json::decoder::Object &jsonObject,
 		}
 		else
 		{
-			// Pass any unknown parameters on to the fallback handler, which will load the built-in parameters ("id" and "uuid"),
-			// and throw an exception if the key is unknown
-            fallbackHandler(name, value);
+            config::throwUnknownParameterError(name);
 		}
     }
 

@@ -73,17 +73,14 @@ public:
 	/// and type may differ from class to class
 	static const model::Attribute kValueAttribute;
 
-protected:
+private:
 	/// @name Virtual Overrides for skill::DataPoint
 	/// @{
 
-	auto load(utils::json::decoder::Object &jsonObject,
-		config::Resolver &resolver,
-		const config::FallbackHandler &fallbackHandler) -> void final;
-		
+	auto load(utils::json::decoder::Object &jsonObject, config::Context &context) -> void final;
+
 	/// @}
 
-private:
 	/// @brief The I/O component this input belongs to
 	/// @todo give this a more descriptive name, e.g. "_device"
 	std::reference_wrapper<TemplateIoComponent> _ioComponent;

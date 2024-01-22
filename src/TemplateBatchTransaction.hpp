@@ -117,16 +117,6 @@ public:
 
 	/// @}
 
-protected:
-	/// @name Virtual Overrides for skill::Element
-	/// @{
-
-	auto load(utils::json::decoder::Object &jsonObject,
-		config::Resolver &resolver,
-		const config::FallbackHandler &fallbackHandler) -> void final;
-
-	/// @}
-
 private:
 	// The tasks need access to out private member functions
 	friend class ReadTask<TemplateBatchTransaction>;
@@ -187,6 +177,13 @@ private:
 	/// Some I/O components may require a separate command for each data type, for example, or may only be able to
 	/// read or write objects with continuous addresses. if this is the case, each separate command needs its own list
 	/// of inputs and/or output, as well as its own read state and write state.
+
+	/// @name Virtual Overrides for skill::Element
+	/// @{
+
+	auto load(utils::json::decoder::Object &jsonObject, config::Context &context) -> void final;
+
+	/// @}
 
 	/// @brief The list of inputs
 	std::list<std::reference_wrapper<AbstractInput>> _inputs;
