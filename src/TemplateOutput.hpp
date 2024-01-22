@@ -35,7 +35,9 @@ public:
 	/// @brief The class object containing meta-information about this element type
 	/// @todo change class name
 	/// @todo assign a unique UUID
-	using Class = ConcreteClass<"TemplateOutput", "deadbeef-dead-beef-dead-beefdeadbeef"_uuid>;
+	/// @todo change display name
+	using Class =
+		ConcreteClass<"TemplateOutput", "deadbeef-dead-beef-dead-beefdeadbeef"_uuid, "template driver output">;
 
 	/// @brief This constructor attaches the output to its I/O component
 	TemplateOutput(std::reference_wrapper<TemplateIoComponent> ioComponent) :

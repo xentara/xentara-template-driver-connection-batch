@@ -30,7 +30,10 @@ public:
 	/// @brief The class object containing meta-information about this element type
 	/// @todo change class name
 	/// @todo assign a unique UUID
-	using Class = ConcreteClass<"TemplateIoComponent", "deadbeef-dead-beef-dead-beefdeadbeef"_uuid>;
+	/// @todo change display name
+	using Class = ConcreteClass<"TemplateIoComponent",
+		"deadbeef-dead-beef-dead-beefdeadbeef"_uuid,
+		"template driver I/O component">;
 
 	/// @brief A handle used to access the I/O component
 	/// @todo implement a proper handle
