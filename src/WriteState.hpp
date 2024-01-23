@@ -47,7 +47,7 @@ public:
 	auto makeReadHandle(const DataBlock &dataBlock, const model::Attribute &attribute) const noexcept
 		-> std::optional<data::ReadHandle>;
 
-	/// @brief Attaches the state to a batch transaction
+	/// @brief Attaches the state to an I/O transaction
 	/// @param dataArray The data array that the attributes should be added to. The caller will use the information in this array
 	/// to allocate the data block.
 	/// @param eventCount A variable that counts the total number of events than can be raised for a single update.

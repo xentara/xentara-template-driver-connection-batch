@@ -32,27 +32,27 @@ using namespace std::literals;
 class AbstractInput;
 class AbstractOutput;
 
-/// @brief A class representing a specific type of batch transaction.
+/// @brief A class representing a specific type of I/O transaction.
 /// @todo rename this class to something more descriptive
-class TemplateBatchTransaction final : public skill::Element, public TemplateIoComponent::ErrorSink, public skill::EnableSharedFromThis<TemplateBatchTransaction>
+class TemplateIoTransaction final : public skill::Element, public TemplateIoComponent::ErrorSink, public skill::EnableSharedFromThis<TemplateIoTransaction>
 {
 public:
 	/// @brief The class object containing meta-information about this element type
 	/// @todo change class name
 	/// @todo assign a unique UUID
 	/// @todo change display name
-	using Class = ConcreteClass<"TemplateBatchTransaction",
+	using Class = ConcreteClass<"TemplateIoTransaction",
 		"deadbeef-dead-beef-dead-beefdeadbeef"_uuid,
 		"template driver transaction">;
 
-	/// @brief This constructor attaches the batch to its I/O component
-	TemplateBatchTransaction(std::reference_wrapper<TemplateIoComponent> ioComponent) :
+	/// @brief This constructor attaches the transaction to its I/O component
+	TemplateIoTransaction(std::reference_wrapper<TemplateIoComponent> ioComponent) :
 		_ioComponent(ioComponent)
 	{
 		ioComponent.get().addErrorSink(*this);
 	}
 	
-	/// @brief Adds an input to be processed by the batch
+	/// @brief Adds an input to be processed by the transaction
 	auto addInput(std::reference_wrapper<AbstractInput> input) -> void;
 
 	/// @brief Iterates over all the attributes that belong to the common read state.
@@ -81,7 +81,7 @@ public:
 		return _readDataBlock;
 	}
 	
-	/// @brief This function adds an output to be processed by the batch
+	/// @brief This function adds an output to be processed by the transaction
 	auto addOutput(std::reference_wrapper<AbstractOutput> output) -> void;
 
 	/// @brief Gets the data block that holds the data for the write operations
@@ -122,8 +122,8 @@ public:
 
 private:
 	// The tasks need access to out private member functions
-	friend class ReadTask<TemplateBatchTransaction>;
-	friend class WriteTask<TemplateBatchTransaction>;
+	friend class ReadTask<TemplateIoTransaction>;
+	friend class WriteTask<TemplateIoTransaction>;
 
 	/// @brief This function is forwarded to the I/O component.
 	auto requestConnect(std::chrono::system_clock::time_point timeStamp) noexcept -> void
@@ -169,11 +169,11 @@ private:
 	auto updateOutputs(
 		std::chrono::system_clock::time_point timeStamp, std::error_code error, const OutputList &outputs) -> void;
 
-	/// @brief The I/O component this batch belongs to
+	/// @brief The I/O component this transaction belongs to
 	/// @todo give this a more descriptive name, e.g. "_device"
 	std::reference_wrapper<TemplateIoComponent> _ioComponent;
 
-	/// @class xentara::plugins::templateDriver::TemplateBatchTransaction
+	/// @class xentara::plugins::templateDriver::TemplateIoTransaction
 	/// @todo Split read and write command split into several commands each, if necessary.
 	/// 
 	/// @todo Some Some I/O components may need to have the read and write command split into several commands each.
@@ -200,7 +200,7 @@ private:
 	/// @brief The read command to send, or nullptr if it hasn't been constructed yet.
 	std::unique_ptr<ReadCommand> _readCommand;
 
-	/// @class xentara::plugins::templateDriver::TemplateBatchTransaction
+	/// @class xentara::plugins::templateDriver::TemplateIoTransaction
 	/// @note There is no member for the write command, as the write command is constructed on-the-fly,
 	/// depending on which outputs wave to be written.
 
@@ -220,9 +220,9 @@ private:
 	WriteState _writeState;
 
 	/// @brief The "read" task
-	ReadTask<TemplateBatchTransaction> _readTask { *this };
+	ReadTask<TemplateIoTransaction> _readTask { *this };
 	/// @brief The "write" task
-	WriteTask<TemplateBatchTransaction> _writeTask { *this };
+	WriteTask<TemplateIoTransaction> _writeTask { *this };
 
 	/// @brief Preallocated runtime buffers
 	///
@@ -238,7 +238,7 @@ private:
 		OutputList _outputsToNotify;
 	} _runtimeBuffers;
 
-	/// @class xentara::plugins::templateDriver::TemplateBatchTransaction::RuntimeBufferSentinel
+	/// @class xentara::plugins::templateDriver::TemplateIoTransaction::RuntimeBufferSentinel
 	/// @brief A sentinel that performs initialization and cleanup of a runtime buffer
 	template <typename Buffer>
 	class RuntimeBufferSentinel;

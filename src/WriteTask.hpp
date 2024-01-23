@@ -10,7 +10,7 @@
 namespace xentara::plugins::templateDriver
 {
 
-/// @brief This class providing callbacks for the Xentara scheduler for the "write" task of batch transactions
+/// @brief This class providing callbacks for the Xentara scheduler for the "write" task of I/O transactions
 template <typename Target>
 class WriteTask final : public process::Task
 {

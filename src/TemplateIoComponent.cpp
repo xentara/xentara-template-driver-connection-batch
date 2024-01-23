@@ -2,7 +2,7 @@
 #include "TemplateIoComponent.hpp"
 
 #include "Attributes.hpp"
-#include "TemplateBatchTransaction.hpp"
+#include "TemplateIoTransaction.hpp"
 #include "TemplateInput.hpp"
 #include "TemplateOutput.hpp"
 
@@ -308,9 +308,9 @@ auto TemplateIoComponent::createChildElement(const skill::Element::Class &elemen
 	{
 		return factory.makeShared<TemplateOutput>(*this);
 	}
-	else if (&elementClass == &TemplateBatchTransaction::Class::instance())
+	else if (&elementClass == &TemplateIoTransaction::Class::instance())
 	{
-		return factory.makeShared<TemplateBatchTransaction>(*this);
+		return factory.makeShared<TemplateIoTransaction>(*this);
 	}
 
 	/// @todo add any other supported child element types

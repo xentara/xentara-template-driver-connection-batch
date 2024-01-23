@@ -23,7 +23,7 @@ namespace xentara::plugins::templateDriver
 
 /// @brief Per-value state information for a read operation.
 /// 
-/// This class contains all the read state information that is tracked separately for all the values read as a batch.
+/// This class contains all the read state information that is tracked separately for all the values read using the same transaction.
 template <std::regular DataType>
 class PerValueReadState final
 {
@@ -58,7 +58,7 @@ public:
 	/// @return A read handle to the value attribute
 	auto valueReadHandle(const DataBlock &dataBlock) const noexcept -> data::ReadHandle;
 
-	/// @brief Attaches the state to its batch transaction
+	/// @brief Attaches the state to its I/O transaction
 	/// @param dataArray The data array that the attributes should be added to. The caller will use the information in this array
 	/// to allocate the data block.
 	/// @param eventCount A variable that counts the total number of events than can be raised for a single update.

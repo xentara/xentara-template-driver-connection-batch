@@ -2,7 +2,7 @@
 #pragma once
 
 #include "TemplateIoComponent.hpp"
-#include "TemplateBatchTransaction.hpp"
+#include "TemplateIoTransaction.hpp"
 #include "TemplateOutput.hpp"
 #include "TemplateInput.hpp"
 
@@ -42,7 +42,7 @@ private:
 		"TemplateDriver",
 		"deadbeef-dead-beef-dead-beefdeadbeef"_uuid,
 		TemplateIoComponent::Class,
-		TemplateBatchTransaction::Class,
+		TemplateIoTransaction::Class,
 		TemplateOutput::Class,
 		TemplateInput::Class>;
 

@@ -2,7 +2,7 @@
 #include "TemplateOutput.hpp"
 
 #include "Attributes.hpp"
-#include "TemplateBatchTransaction.hpp"
+#include "TemplateIoTransaction.hpp"
 
 #include <xentara/config/Context.hpp>
 #include <xentara/config/Errors.hpp>
@@ -26,19 +26,19 @@ const model::Attribute TemplateOutput::kValueAttribute { model::Attribute::kValu
 auto TemplateOutput::load(utils::json::decoder::Object &jsonObject, config::Context &context) -> void
 {
 	// Go through all the members of the JSON object that represents this object
-	bool ioBatchLoaded = false;
+	bool ioTransactionLoaded = false;
 	for (auto && [name, value] : jsonObject)
     {
 		/// @todo use a more descriptive keyword, e.g. "poll"
-		if (name == "batchTransaction"sv)
+		if (name == "ioTransaction"sv)
 		{
-			context.resolve<TemplateBatchTransaction>(value, [this](std::reference_wrapper<TemplateBatchTransaction> batchTransaction)
+			context.resolve<TemplateIoTransaction>(value, [this](std::reference_wrapper<TemplateIoTransaction> ioTransaction)
 				{ 
-					_batchTransaction = &batchTransaction.get();
-					batchTransaction.get().addInput(*this);
-					batchTransaction.get().addOutput(*this);
+					_ioTransaction = &ioTransaction.get();
+					ioTransaction.get().addInput(*this);
+					ioTransaction.get().addOutput(*this);
 				});
-			ioBatchLoaded = true;
+			ioTransactionLoaded = true;
 		}
 		/// @todo load custom configuration parameters
 		else if (name == "TODO"sv)
@@ -61,11 +61,11 @@ auto TemplateOutput::load(utils::json::decoder::Object &jsonObject, config::Cont
 		}
     }
 
-	// Make sure that a batch transaction was specified
-	if (!ioBatchLoaded)
+	// Make sure that an I/O transaction was specified
+	if (!ioTransactionLoaded)
 	{
-		/// @todo replace "batch transaction" and "template output" with more descriptive names
-		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("missing batch transaction in template output"));
+		/// @todo replace "I/O transaction" and "template output" with more descriptive names
+		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("missing I/O transaction in template output"));
 	}
 	/// @todo perform consistency and completeness checks
 	if (!"TODO")
@@ -87,9 +87,9 @@ auto TemplateOutput::directions() const -> io::Directions
 
 auto TemplateOutput::forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool
 {
-	// forEachAttribute() must not be called before references have been resolved, so the batch transaction should have been
+	// forEachAttribute() must not be called before references have been resolved, so the I/O transaction should have been
 	// set already.
-	if (!_batchTransaction) [[unlikely]]
+	if (!_ioTransaction) [[unlikely]]
 	{
 		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateOutput::forEachAttribute() called before cross references have been resolved");
 	}
@@ -100,20 +100,20 @@ auto TemplateOutput::forEachAttribute(const model::ForEachAttributeFunction &fun
 
 		// Handle the read state attributes
 		_readState.forEachAttribute(function) ||
-		// Also handle the common read state attributes from the batch transaction
-		_batchTransaction->forEachReadStateAttribute(function) ||
+		// Also handle the common read state attributes from the I/O transaction
+		_ioTransaction->forEachReadStateAttribute(function) ||
 
 		// Handle the write state attributes
 		_writeState.forEachAttribute(function);
 
-	/// @todo handle any additional attributes this class supports, including attributes inherited from the I/O component and the batch transaction
+	/// @todo handle any additional attributes this class supports, including attributes inherited from the I/O component and the I/O transaction
 }
 
 auto TemplateOutput::forEachEvent(const model::ForEachEventFunction &function) -> bool
 {
-	// forEachEvent() must not be called before references have been resolved, so the batch transaction should have been
+	// forEachEvent() must not be called before references have been resolved, so the I/O transaction should have been
 	// set already.
-	if (!_batchTransaction) [[unlikely]]
+	if (!_ioTransaction) [[unlikely]]
 	{
 		throw std::logic_error("internal error: xentara::plugins::templateDriver::TemplateInput::forEachEvent() called before cross references have been resolved");
 	}
@@ -121,27 +121,27 @@ auto TemplateOutput::forEachEvent(const model::ForEachEventFunction &function) -
 	return
 		// Handle the read state events
 		_readState.forEachEvent(function, sharedFromThis()) ||
-		// Also handle the common read state events from the batch transaction
-		_batchTransaction->forEachReadStateEvent(function) ||
+		// Also handle the common read state events from the I/O transaction
+		_ioTransaction->forEachReadStateEvent(function) ||
 
 		// Handle the write state events
 		_writeState.forEachEvent(function, sharedFromThis());
 
-	/// @todo handle any additional events this class supports, including events inherited from the I/O component and the batch transaction
+	/// @todo handle any additional events this class supports, including events inherited from the I/O component and the I/O transaction
 }
 
 auto TemplateOutput::makeReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
 {
-	// makeReadHandle() must not be called before references have been resolved, so the batch transaction should have been
+	// makeReadHandle() must not be called before references have been resolved, so the I/O transaction should have been
 	// set already.
-	if (!_batchTransaction) [[unlikely]]
+	if (!_ioTransaction) [[unlikely]]
 	{
 		// Don't throw an exception, because this function is noexcept
 		return std::make_error_code(std::errc::invalid_argument);
 	}
 	// Get the data blocks
-	const auto &readDataBlock = _batchTransaction->readDataBlock();
-	const auto &writeDataBlock = _batchTransaction->writeDataBlock();
+	const auto &readDataBlock = _ioTransaction->readDataBlock();
+	const auto &writeDataBlock = _ioTransaction->writeDataBlock();
 	
 	// Handle the value attribute separately
 	if (attribute == kValueAttribute)
@@ -154,8 +154,8 @@ auto TemplateOutput::makeReadHandle(const model::Attribute &attribute) const noe
 	{
 		return handle;
 	}
-	// Also handle the common read state attributes from the batch transaction
-	if (auto handle = _batchTransaction->makeReadStateReadHandle(attribute))
+	// Also handle the common read state attributes from the I/O transaction
+	if (auto handle = _ioTransaction->makeReadStateReadHandle(attribute))
 	{
 		return handle;
 	}
@@ -166,7 +166,7 @@ auto TemplateOutput::makeReadHandle(const model::Attribute &attribute) const noe
 		return handle;
 	}
 
-	/// @todo handle any additional readable attributes this class supports, including attributes inherited from the I/O component and the batch transaction
+	/// @todo handle any additional readable attributes this class supports, including attributes inherited from the I/O component and the I/O transaction
 
 	return std::nullopt;
 }
@@ -181,7 +181,7 @@ auto TemplateOutput::makeWriteHandle(const model::Attribute &attribute) noexcept
 		return data::WriteHandle { std::in_place_type<double>, &TemplateOutput::scheduleOutputValue, weakFromThis() };
 	}
 
-	/// @todo handle any additional writable attributes this class supports, including attributes inherited from the I/O component and the batch transaction
+	/// @todo handle any additional writable attributes this class supports, including attributes inherited from the I/O component and the I/O transaction
 
 	return std::nullopt;
 }

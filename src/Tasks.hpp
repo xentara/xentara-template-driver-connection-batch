@@ -7,9 +7,9 @@
 namespace xentara::plugins::templateDriver::tasks
 {
 
-/// @brief A Xentara task used to read the data points attached to a batch transaction
+/// @brief A Xentara task used to read the data points attached to an I/O transaction
 extern const process::Task::Role kRead;
-/// @brief A Xentara task used to write the data points attached to a batch transaction
+/// @brief A Xentara task used to write the data points attached to an I/O transaction
 extern const process::Task::Role kWrite;
 
 } // namespace xentara::plugins::templateDriver::tasks

@@ -16,7 +16,7 @@ namespace xentara::plugins::templateDriver
 using namespace std::literals;
 
 class TemplateIoComponent;
-class TemplateBatchTransaction;
+class TemplateIoTransaction;
 
 /// @brief A class representing a specific type of input.
 /// @todo rename this class to something more descriptive
@@ -85,9 +85,9 @@ private:
 	/// @todo give this a more descriptive name, e.g. "_device"
 	std::reference_wrapper<TemplateIoComponent> _ioComponent;
 
-	/// @brief The batch transaction this input belongs to, or nullptr if it hasn't been loaded yet.
+	/// @brief The I/O transaction this input belongs to, or nullptr if it hasn't been loaded yet.
 	/// @todo give this a more descriptive name, e.g. "_poll"
-	TemplateBatchTransaction *_batchTransaction { nullptr };
+	TemplateIoTransaction *_ioTransaction { nullptr };
 
 	/// @class xentara::plugins::templateDriver::TemplateInput
 	/// @todo add information needed to decode the value from the payload of a read command, like e.g. a data offset.

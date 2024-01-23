@@ -1,5 +1,5 @@
 // Copyright (c) embedded ocean GmbH
-#include "TemplateBatchTransaction.hpp"
+#include "TemplateIoTransaction.hpp"
 
 #include "Attributes.hpp"
 #include "Tasks.hpp"
@@ -28,7 +28,7 @@ namespace xentara::plugins::templateDriver
 using namespace std::literals;
 
 template <typename Buffer>
-class TemplateBatchTransaction::RuntimeBufferSentinel final
+class TemplateIoTransaction::RuntimeBufferSentinel final
 {
 public:
 	/// @brief The constructor clears the buffer of any garbage data that may still be in there
@@ -48,10 +48,10 @@ private:
 	Buffer &_buffer;
 };
 
-auto TemplateBatchTransaction::load(utils::json::decoder::Object &jsonObject, config::Context &context) -> void
+auto TemplateIoTransaction::load(utils::json::decoder::Object &jsonObject, config::Context &context) -> void
 {
 	// Go through all the members of the JSON object that represents this object
-	bool ioBatchLoaded = false;
+	bool ioTransactionLoaded = false;
 	for (auto && [name, value] : jsonObject)
     {
 		/// @todo load configuration parameters
@@ -64,7 +64,7 @@ auto TemplateBatchTransaction::load(utils::json::decoder::Object &jsonObject, co
 			if (!"TODO")
 			{
 				/// @todo use an error message that tells the user exactly what is wrong
-				utils::json::decoder::throwWithLocation(value, std::runtime_error("TODO is wrong with TODO parameter of template batch transaction"));
+				utils::json::decoder::throwWithLocation(value, std::runtime_error("TODO is wrong with TODO parameter of template I/O transaction"));
 			}
 
 			/// @todo set the appropriate member variables
@@ -79,37 +79,37 @@ auto TemplateBatchTransaction::load(utils::json::decoder::Object &jsonObject, co
 	if (!"TODO")
 	{
 		/// @todo use an error message that tells the user exactly what is wrong
-		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("TODO is wrong with template batch transaction"));
+		utils::json::decoder::throwWithLocation(jsonObject, std::runtime_error("TODO is wrong with template I/O transaction"));
 	}
 }
 
-auto TemplateBatchTransaction::addInput(std::reference_wrapper<AbstractInput> input) -> void
+auto TemplateIoTransaction::addInput(std::reference_wrapper<AbstractInput> input) -> void
 {
 	// Make sure we belong to the same I/O component
 	if (&input.get().ioComponent() != &_ioComponent.get())
 	{
-		/// @todo replace "template data point", "batch transaction", and "I/O component" with more descriptive names
-		throw std::runtime_error("Attempt to attach template data point to batch transaction of different I/O component");
+		/// @todo replace "template data point", "I/O transaction", and "I/O component" with more descriptive names
+		throw std::runtime_error("Attempt to attach template data point to I/O transaction of different I/O component");
 	}
 
 	// Add it
 	_inputs.push_back(input);
 }
 
-auto TemplateBatchTransaction::addOutput(std::reference_wrapper<AbstractOutput> output) -> void
+auto TemplateIoTransaction::addOutput(std::reference_wrapper<AbstractOutput> output) -> void
 {
 	// Make sure we belong to the same I/O component
 	if (&output.get().ioComponent() != &_ioComponent.get())
 	{
-		/// @todo replace "template data point", "batch transaction", and "I/O component" with more descriptive names
-		throw std::runtime_error("Attempt to attach template data point to batch transaction of different I/O component");
+		/// @todo replace "template data point", "I/O transaction", and "I/O component" with more descriptive names
+		throw std::runtime_error("Attempt to attach template data point to I/O transaction of different I/O component");
 	}
 
 	// Add it
 	_outputs.push_back(output);
 }
 
-auto TemplateBatchTransaction::forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool
+auto TemplateIoTransaction::forEachAttribute(const model::ForEachAttributeFunction &function) const -> bool
 {
 	return
 		// Handle the read state attributes
@@ -120,7 +120,7 @@ auto TemplateBatchTransaction::forEachAttribute(const model::ForEachAttributeFun
 	/// @todo handle any additional attributes this class supports, including attributes inherited from the I/O component
 }
 
-auto TemplateBatchTransaction::forEachEvent(const model::ForEachEventFunction &function) -> bool
+auto TemplateIoTransaction::forEachEvent(const model::ForEachEventFunction &function) -> bool
 {
 	return
 		// Handle the read state events
@@ -131,7 +131,7 @@ auto TemplateBatchTransaction::forEachEvent(const model::ForEachEventFunction &f
 	/// @todo handle any additional events this class supports, including events inherited from the I/O component
 }
 
-auto TemplateBatchTransaction::forEachTask(const model::ForEachTaskFunction &function) -> bool
+auto TemplateIoTransaction::forEachTask(const model::ForEachTaskFunction &function) -> bool
 {
 	// Handle all the tasks we support
 	return
@@ -141,7 +141,7 @@ auto TemplateBatchTransaction::forEachTask(const model::ForEachTaskFunction &fun
 	/// @todo handle any additional tasks this class supports
 }
 
-auto TemplateBatchTransaction::makeReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
+auto TemplateIoTransaction::makeReadHandle(const model::Attribute &attribute) const noexcept -> std::optional<data::ReadHandle>
 {
 	// Handle the read state attributes
 	if (auto handle = _readState.makeReadHandle(_readDataBlock, attribute))
@@ -159,23 +159,23 @@ auto TemplateBatchTransaction::makeReadHandle(const model::Attribute &attribute)
 	return std::nullopt;
 }
 
-auto TemplateBatchTransaction::forEachReadStateAttribute(const model::ForEachAttributeFunction &function) const -> bool
+auto TemplateIoTransaction::forEachReadStateAttribute(const model::ForEachAttributeFunction &function) const -> bool
 {
 	return _readState.forEachAttribute(function);
 }
 
-auto TemplateBatchTransaction::forEachReadStateEvent(const model::ForEachEventFunction &function) -> bool
+auto TemplateIoTransaction::forEachReadStateEvent(const model::ForEachEventFunction &function) -> bool
 {
 	return _readState.forEachEvent(function, sharedFromThis());
 }
 
-auto TemplateBatchTransaction::makeReadStateReadHandle(const model::Attribute &attribute) const noexcept
+auto TemplateIoTransaction::makeReadStateReadHandle(const model::Attribute &attribute) const noexcept
 	-> std::optional<data::ReadHandle>
 {
 	return _readState.makeReadHandle(_readDataBlock, attribute);
 }
 
-auto TemplateBatchTransaction::realize() -> void
+auto TemplateIoTransaction::realize() -> void
 {
 	// Track the buffer size we need for pending events
 	std::size_t readEventCount { 0 };
@@ -205,7 +205,7 @@ auto TemplateBatchTransaction::realize() -> void
 	_runtimeBuffers._outputsToNotify.reset(_outputs.size());
 }
 
-auto TemplateBatchTransaction::prepare() -> void
+auto TemplateIoTransaction::prepare() -> void
 {
 	// Create a read command
 	/// @todo initialized the read command properly based on the inputs to read.
@@ -214,7 +214,7 @@ auto TemplateBatchTransaction::prepare() -> void
 	/// @todo provide the information needed to decode the value to the inputs, like e.g. the correct data data offsets.
 }
 
-auto TemplateBatchTransaction::ioComponentStateChanged(std::chrono::system_clock::time_point timeStamp, std::error_code error) -> void
+auto TemplateIoTransaction::ioComponentStateChanged(std::chrono::system_clock::time_point timeStamp, std::error_code error) -> void
 {
 	// We cannot reset the error to Ok because we don't have a read command payload. So we use the special custom error code instead.
 	auto effectiveError = error ? error : CustomError::NoData;
@@ -225,7 +225,7 @@ auto TemplateBatchTransaction::ioComponentStateChanged(std::chrono::system_clock
 	updateInputs(timeStamp, utils::eh::unexpected(effectiveError));
 }
 
-auto TemplateBatchTransaction::performReadTask(const process::ExecutionContext &context) -> void
+auto TemplateIoTransaction::performReadTask(const process::ExecutionContext &context) -> void
 {
 	// Only perform the read only if the I/O component is connected
 	if (!_ioComponent.get().connected())
@@ -237,7 +237,7 @@ auto TemplateBatchTransaction::performReadTask(const process::ExecutionContext &
 	read(context.scheduledTime());
 }
 
-auto TemplateBatchTransaction::read(std::chrono::system_clock::time_point timeStamp) -> void
+auto TemplateIoTransaction::read(std::chrono::system_clock::time_point timeStamp) -> void
 {
 	try
 	{
@@ -259,7 +259,7 @@ auto TemplateBatchTransaction::read(std::chrono::system_clock::time_point timeSt
 	}
 }
 
-auto TemplateBatchTransaction::handleReadError(std::chrono::system_clock::time_point timeStamp, std::error_code error)
+auto TemplateIoTransaction::handleReadError(std::chrono::system_clock::time_point timeStamp, std::error_code error)
 	-> void
 {
 	// Update our own state together with those of the inputs
@@ -268,7 +268,7 @@ auto TemplateBatchTransaction::handleReadError(std::chrono::system_clock::time_p
 	_ioComponent.get().handleError(timeStamp, error, this);
 }
 
-auto TemplateBatchTransaction::performWriteTask(const process::ExecutionContext &context) -> void
+auto TemplateIoTransaction::performWriteTask(const process::ExecutionContext &context) -> void
 {
 	// Only perform the read only if the I/O component is connected
 	if (!_ioComponent.get().connected())
@@ -280,7 +280,7 @@ auto TemplateBatchTransaction::performWriteTask(const process::ExecutionContext 
 	write(context.scheduledTime());
 }
 
-auto TemplateBatchTransaction::write(std::chrono::system_clock::time_point timeStamp) -> void
+auto TemplateIoTransaction::write(std::chrono::system_clock::time_point timeStamp) -> void
 {
 	// Protect use of the list of outputs to notify
 	RuntimeBufferSentinel eventsToRaiseSentinel(_runtimeBuffers._outputsToNotify);
@@ -323,7 +323,7 @@ auto TemplateBatchTransaction::write(std::chrono::system_clock::time_point timeS
 	}
 }
 
-auto TemplateBatchTransaction::handleWriteError(std::chrono::system_clock::time_point timeStamp, std::error_code error, const OutputList &outputs)
+auto TemplateIoTransaction::handleWriteError(std::chrono::system_clock::time_point timeStamp, std::error_code error, const OutputList &outputs)
 	-> void
 {
 	// Update our own state together with those of the inputs
@@ -332,7 +332,7 @@ auto TemplateBatchTransaction::handleWriteError(std::chrono::system_clock::time_
 	_ioComponent.get().handleError(timeStamp, error, this);
 }
 
-auto TemplateBatchTransaction::updateInputs(std::chrono::system_clock::time_point timeStamp, const utils::eh::expected<std::reference_wrapper<const ReadCommand::Payload>, std::error_code> &payloadOrError)
+auto TemplateIoTransaction::updateInputs(std::chrono::system_clock::time_point timeStamp, const utils::eh::expected<std::reference_wrapper<const ReadCommand::Payload>, std::error_code> &payloadOrError)
 	-> void
 {
 	// Protect use of the pending event buffer
@@ -354,7 +354,7 @@ auto TemplateBatchTransaction::updateInputs(std::chrono::system_clock::time_poin
 	sentinel.commit(timeStamp, _runtimeBuffers._eventsToRaise);
 }
 
-auto TemplateBatchTransaction::updateOutputs(std::chrono::system_clock::time_point timeStamp, std::error_code error, const OutputList &outputs) -> void
+auto TemplateIoTransaction::updateOutputs(std::chrono::system_clock::time_point timeStamp, std::error_code error, const OutputList &outputs) -> void
 {
 	// Protect use of the pending event buffer
 	RuntimeBufferSentinel eventsToRaiseSentinel(_runtimeBuffers._eventsToRaise);

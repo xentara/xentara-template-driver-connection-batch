@@ -22,7 +22,7 @@ namespace xentara::plugins::templateDriver
 
 /// @brief Common state information for a read operation.
 ///
-/// This class contains all the read state information that is common to all values read as a batch.
+/// This class contains all the read state information that is common to all values read using the same transaction.
 class CommonReadState final
 {
 public:
@@ -65,7 +65,7 @@ public:
 	auto makeReadHandle(const DataBlock &dataBlock, const model::Attribute &attribute) const noexcept
 		-> std::optional<data::ReadHandle>;
 
-	/// @brief Attaches the state to its batch transaction
+	/// @brief Attaches the state to its I/O transaction
 	/// @param dataArray The data array that the attributes should be added to. The caller will use the information in this array
 	/// to allocate the data block.
 	/// @param eventCount A variable that counts the total number of events than can be raised for a single update.
