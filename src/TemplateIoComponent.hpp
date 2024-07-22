@@ -173,6 +173,10 @@ private:
 
 		auto preparePostOperational(const process::ExecutionContext &context) -> Status final;
 
+		auto postOperational(const process::ExecutionContext &context) -> Status final;
+
+		auto finishPostOperational(const process::ExecutionContext &context) -> void final;
+
 		/// @}
 
 	private:

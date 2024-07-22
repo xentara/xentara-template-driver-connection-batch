@@ -35,6 +35,10 @@ public:
 	auto operational(const process::ExecutionContext &context) -> void final;
 
 	auto preparePostOperational(const process::ExecutionContext &context) -> Status final;
+
+	auto postOperational(const process::ExecutionContext &context) -> Status final;
+
+	auto finishPostOperational(const process::ExecutionContext &context) -> void final;
 		
 	/// @}
 
@@ -70,10 +74,24 @@ auto WriteTask<Target>::operational(const process::ExecutionContext &context) ->
 template <typename Target>
 auto WriteTask<Target>::preparePostOperational(const process::ExecutionContext &context) -> Status
 {
+	// Everything in the post operational stage is optional, so we can report ready right away
+	return Status::Ready;
+}
+
+template <typename Target>
+auto WriteTask<Target>::postOperational(const process::ExecutionContext &context) -> Status
+{
+	// We just do the same thing as in the operational stage
+	operational(context);
+
+	return Status::Ready;
+}
+
+template <typename Target>
+auto WriteTask<Target>::finishPostOperational(const process::ExecutionContext &context) -> void
+{
 	// Request a disconnect
 	_target.get().requestDisconnect(context.scheduledTime());
-
-	return Status::Completed;
 }
 
 } // namespace xentara::plugins::templateDriver
